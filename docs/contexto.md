@@ -25,16 +25,15 @@
 | 2 — Backend | 4. Backend mínimo | ✅ Completada |
 | 2 — Backend | 5. API en memoria | ✅ Completada |
 | 2 — Backend | 6. Validación | ✅ Completada |
-| 2 — Backend | 7. Conexión | ⏳ Pendiente |
+| 2 — Backend | 7. Conexión | ✅ Completada (fetch + CORS) |
 | 3 — Base de datos | 8–10 | ⏳ Pendiente |
 
 **En curso:** el usuario pidió terminar las fases 4 a 9 (backend, API, validación, conexión, MongoDB y persistencia) y subirlas a GitHub.
 Se avanza fase a fase, con commit y push al cerrar cada una; las decisiones siguen las recomendaciones de Claude (delegadas).
 
-**Dónde viven ahora los datos:** en el `localStorage` del navegador (D17), bajo la clave `productos`, como texto JSON.
-- Sobreviven a recargar la página y a cerrar el navegador.
-- Se pierden si se borran los datos del sitio en el navegador.
-- Solo existen en **ese navegador de ese equipo**: otro navegador u otro ordenador no los ve.
+**Dónde viven ahora los datos:** en un **array en la memoria del servidor NestJS** (desde la fase 7; antes, `localStorage`).
+- Sobreviven a recargar la página y son los mismos para cualquier navegador que use el backend.
+- **Se pierden al reiniciar el servidor** (vuelven los 3 productos de ejemplo).
 
 ---
 
@@ -99,7 +98,7 @@ actividad01/
 └── frontend/
     ├── index.html          ← formulario + tabla con 3 productos de ejemplo (fase 1)
     ├── css/estilos.css     ← estilos (fase 2)
-    └── js/app.js           ← comportamiento: CRUD con localStorage (fase 3)
+    └── js/app.js           ← comportamiento; desde la fase 7 habla con el backend con fetch
 ```
 
 ---
@@ -126,7 +125,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D14 | Estilo: cabecera azul, secciones como tarjetas blancas, botón Eliminar en rojo, colores en variables CSS. | Diseño sencillo y legible; colores centralizados. | Claude (delegado) |
 | D15 | Se crea `docs/contexto.md` como registro vivo de todo el proyecto. | No perder el contexto entre sesiones. | Usuario |
 | D16 | Se modifica `CLAUDE.md`: nueva regla 3.6 (leer y actualizar `contexto.md`), servidor local confirmado (`live-server`), raíz `actividad01/`, `contexto.md` en la estructura y en el cierre de fases/sesiones, y aviso sobre Homebrew en el bloque 3. | Que cualquier sesión nueva tenga en cuenta el registro y las decisiones. | Usuario |
-| D17 | **El CRUD de la fase 3 usa `localStorage`** (opción A: directamente, sin pasar antes por un array en memoria). Se acuerda la excepción a `CLAUDE.md` 5.4, que lo ponía fuera de alcance. | Decisión del usuario. Consecuencia aceptada: en el bloque 1 los datos **no** se pierden al recargar; el motivo del backend pasa a ser compartir los datos entre navegadores/equipos. | Usuario |
+| D17 | **El CRUD de la fase 3 usa `localStorage`** *(vigente solo en la fase 3; en la fase 7 lo sustituye `fetch`, D33)* (opción A: directamente, sin pasar antes por un array en memoria). Se acuerda la excepción a `CLAUDE.md` 5.4, que lo ponía fuera de alcance. | Decisión del usuario. Consecuencia aceptada: en el bloque 1 los datos **no** se pierden al recargar; el motivo del backend pasa a ser compartir los datos entre navegadores/equipos. | Usuario |
 | D18 | **Se usa Git** (repositorio local, sin remotos). Se instala mediante las Command Line Tools de Apple (`xcode-select --install`). Autor de los commits: `andres <andresrodriguezinfo@gmail.com>`, configurado solo para este repositorio. Los commits llevan la línea `Co-Authored-By: Claude`. Primer commit titulado "fase 1", aunque incluye también la fase 2. Se actualiza `CLAUDE.md` (apartados 4 y 5.4), que antes prohibía Git. | Petición del usuario: llevar control de versiones del proyecto. | Usuario |
 | D19 | Se crea `.gitignore` con `.DS_Store`. | Finder crea esos ficheros solo; no son del proyecto. | Usuario |
 | D20 | **Repositorio conectado a GitHub**: `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (remoto `origin`, **público**). Autenticación por **HTTPS + token personal**, guardado en el llavero de macOS (lo guardó Claude a petición del usuario). Se mantiene el email real en los commits (visible públicamente, aceptado por el usuario). Se actualiza `CLAUDE.md` (apartado 4). | Petición del usuario. HTTPS + token elegido frente a SSH. | Usuario |
@@ -142,6 +141,8 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D30 | API en memoria: array en `ProductosService` con 3 productos de ejemplo e `id` numérico (`siguienteId`). `ParseIntPipe` convierte `:id` a número (400 si no lo es). `NotFoundException` → 404. `DELETE` responde 204. Nombres de métodos en español (`crear`, `listar`, `obtenerUno`, `actualizar`, `eliminar`). | Lo pedido en `CLAUDE.md` 5.2; códigos de estado estándar. | Claude (delegado) |
 | D31 | Validación con DTO + `class-validator` y `class-transformer` (instalados en `backend/`). `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform`. Mensajes en español. Los textos se recortan (`trim`) con `@Transform`. `ActualizarProductoDto` repite las reglas con `@IsOptional` en vez de usar `PartialType` (evita otra librería). | Reglas de `CLAUDE.md` 5.1; "no confiar en lo que llega del cliente". | Claude (delegado) |
 | D32 | En `actualizar`, se copian solo los campos con valor (no `Object.assign`). | Error detectado: con `transform: true` y `target ES2023`, los campos no enviados existen como `undefined` y borraban los datos. | Claude |
+| D33 | Fase 7: la parte 1 de `app.js` usa `fetch` contra `http://localhost:3000/productos` en lugar de `localStorage`. Las funciones de datos pasan a `async` y quien las llama usa `await` (como anticipaba D24). Función común `peticion()` que convierte los errores HTTP y de red en mensajes legibles. Se mantiene la validación del frontend. | `CLAUDE.md` fase 7; separación de la capa de datos. | Claude (delegado) |
+| D34 | CORS: `app.enableCors({ origin: ['http://127.0.0.1:5500', 'http://localhost:5500'] })`. Solo nuestro frontend, no `*`. | Se observó primero el error real en Chrome; autorizar solo lo necesario. | Claude (delegado) |
 
 ---
 
@@ -229,6 +230,16 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - **Error encontrado y corregido:** `PATCH {"precio":999.5}` dejaba el producto como `{"id":1,"precio":999.5}` (D32).
   Tras corregirlo, el PATCH cambia solo lo enviado.
 
+**Fase 7 — Conexión frontend ↔ backend**
+- `app.js`: parte 1 reescrita con `fetch`; las demás solo añaden `async`/`await` y manejo de errores (D33).
+- **CORS observado** en Chrome headless (página servida desde `http://127.0.0.1:5500`):
+  *"blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present"*. El servidor respondía 200 (visto con `curl`),
+  pero el navegador ocultaba la respuesta; el frontend mostraba "No se puede conectar con el servidor".
+- Solución: `enableCors` con los orígenes del frontend (D34). Comprobado: origen autorizado recibe la cabecera; uno ajeno no.
+- Prueba automática en Chrome headless: listar, crear, editar (GET :id + PATCH), eliminar y rechazo 400 del servidor. Todo OK.
+- Para las pruebas, `live-server` se reinició montando la carpeta temporal de Claude en `/__prueba__` (no afecta al frontend).
+- **Bloque 2 cerrado.**
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -238,7 +249,7 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [x] Conectar con GitHub y hacer el primer `push` (D20).
 - [ ] Revocar el token de GitHub cuando deje de usarse (se compartió en la conversación con Claude).
 - [x] Fase 3 (con `localStorage`, D17).
-- [ ] Que el usuario pruebe la fase 3 en su navegador.
+- [ ] Que el usuario pruebe la aplicación en su navegador (frontend + backend arrancados).
 - [x] Commit y push de la fase 3.
 - [x] Decidir el orden: se sigue el de `CLAUDE.md` (D25).
 - [x] Fase 4 (NestJS mínimo).

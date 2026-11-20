@@ -1,92 +1,85 @@
 // =====================================================================
-// Fase 3: COMPORTAMIENTO
+// COMPORTAMIENTO DEL FRONTEND
 // El código está dividido en 4 partes:
-//   1. Acceso a los datos  → lo ÚNICO que habla con el almacén (localStorage).
-//   2. Validación          → comprueba que los datos son correctos.
+//   1. Acceso a los datos  → lo ÚNICO que habla con los datos (desde la fase 7: el backend, con fetch).
+//   2. Validación          → comprueba que los datos son correctos antes de enviarlos.
 //   3. Interfaz            → lee y modifica la página (el DOM).
 //   4. Eventos             → qué pasa cuando el usuario hace algo.
-// En la fase 7, solo cambiará por dentro la parte 1 (localStorage → fetch al backend).
+//
+// Historia: en la fase 3 la parte 1 usaba localStorage. En la fase 7 solo ha cambiado POR DENTRO
+// la parte 1 (localStorage → fetch). El resto solo ha añadido "await", porque ahora hay que ESPERAR
+// la respuesta del servidor.
 // =====================================================================
 
 
 // ---------------------------------------------------------------------
-// 1. ACCESO A LOS DATOS (localStorage)
+// 1. ACCESO A LOS DATOS (petición HTTP al backend con fetch)
 // ---------------------------------------------------------------------
 
-// Nombre con el que guardamos la lista en el almacén del navegador
-const CLAVE_ALMACEN = 'productos';
+// Dirección de la API del backend (NestJS, fase 5)
+const URL_API = 'http://localhost:3000/productos';
 
-// Productos de ejemplo: se cargan solo la primera vez (cuando el almacén está vacío)
-const PRODUCTOS_INICIALES = [
-  { id: 1, nombre: 'MacBook Air 13"', marca: 'Apple', categoria: 'portatil', precio: 1199, stock: 5, descripcion: 'Portátil ligero con chip M3.' },
-  { id: 2, nombre: 'Galaxy S24', marca: 'Samsung', categoria: 'smartphone', precio: 899.99, stock: 12, descripcion: 'Pantalla de 6,2 pulgadas.' },
-  { id: 3, nombre: 'WH-1000XM5', marca: 'Sony', categoria: 'audio', precio: 349, stock: 0, descripcion: '' }
-];
-
-// Lee la lista completa del almacén.
-// localStorage solo guarda TEXTO: JSON.parse convierte ese texto otra vez en una lista de objetos.
-function leerAlmacen() {
-  const texto = localStorage.getItem(CLAVE_ALMACEN);
-  if (texto === null) {
-    // Primera visita: el almacén está vacío → guardamos los productos de ejemplo
-    guardarAlmacen(PRODUCTOS_INICIALES);
-    return PRODUCTOS_INICIALES;
+// Hace una petición HTTP al backend y devuelve los datos de la respuesta.
+// Si algo falla, lanza un Error con un mensaje que se puede enseñar al usuario.
+// "async" = esta función tarda (va por la red); quien la llame debe usar "await" para esperar el resultado.
+async function peticion(url, opciones) {
+  let respuesta;
+  try {
+    respuesta = await fetch(url, opciones);
+  } catch (error) {
+    // fetch solo falla así cuando NO hay respuesta: servidor apagado, sin red... o bloqueo por CORS
+    throw new Error('No se puede conectar con el servidor. ¿Está arrancado el backend en el puerto 3000?');
   }
-  return JSON.parse(texto);
-}
 
-// Guarda la lista completa en el almacén. JSON.stringify convierte la lista en texto.
-function guardarAlmacen(productos) {
-  localStorage.setItem(CLAVE_ALMACEN, JSON.stringify(productos));
-}
-
-// Devuelve todos los productos
-function obtenerProductos() {
-  return leerAlmacen();
-}
-
-// Devuelve un producto por su id (o undefined si no existe)
-function obtenerProducto(id) {
-  return leerAlmacen().find(function (producto) {
-    return producto.id === id;
-  });
-}
-
-// Crea un producto nuevo y lo devuelve (ya con su id)
-function crearProducto(datos) {
-  const productos = leerAlmacen();
-
-  // id sencillo: el mayor id que exista + 1 (o 1 si la lista está vacía)
-  let idMayor = 0;
-  for (const producto of productos) {
-    if (producto.id > idMayor) {
-      idMayor = producto.id;
+  // respuesta.ok es true si el código de estado es 2xx (200, 201, 204...)
+  if (!respuesta.ok) {
+    // El backend explica el error en un JSON: { message: "..." } o { message: ["...", "..."] }
+    const cuerpo = await respuesta.json().catch(() => null);
+    let mensaje = cuerpo && cuerpo.message ? cuerpo.message : 'Error ' + respuesta.status;
+    if (Array.isArray(mensaje)) {
+      mensaje = 'El servidor ha rechazado los datos:\n• ' + mensaje.join('\n• ');
     }
+    throw new Error(mensaje);
   }
 
-  const nuevo = { id: idMayor + 1, ...datos };   // "...datos" copia todos los campos de datos
-  productos.push(nuevo);
-  guardarAlmacen(productos);
-  return nuevo;
+  // 204 = "hecho, sin contenido" (al eliminar): no hay JSON que leer
+  if (respuesta.status === 204) {
+    return null;
+  }
+  return respuesta.json();   // convierte el JSON de la respuesta en objetos de JavaScript
 }
 
-// Sustituye los datos de un producto existente y lo devuelve actualizado
-function actualizarProducto(id, datos) {
-  const productos = leerAlmacen();
-  const posicion = productos.findIndex(function (producto) {
-    return producto.id === id;
-  });
-  productos[posicion] = { id: id, ...datos };
-  guardarAlmacen(productos);
-  return productos[posicion];
+// GET /productos
+async function obtenerProductos() {
+  return peticion(URL_API);
 }
 
-// Elimina un producto por su id
-function eliminarProducto(id) {
-  const productos = leerAlmacen().filter(function (producto) {
-    return producto.id !== id;   // nos quedamos con todos MENOS el que se elimina
+// GET /productos/:id
+async function obtenerProducto(id) {
+  return peticion(URL_API + '/' + id);
+}
+
+// POST /productos  (los datos viajan en el cuerpo, como texto JSON)
+async function crearProducto(datos) {
+  return peticion(URL_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },   // avisa al servidor de que enviamos JSON
+    body: JSON.stringify(datos)
   });
-  guardarAlmacen(productos);
+}
+
+// PATCH /productos/:id
+async function actualizarProducto(id, datos) {
+  return peticion(URL_API + '/' + id, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos)
+  });
+}
+
+// DELETE /productos/:id
+async function eliminarProducto(id) {
+  return peticion(URL_API + '/' + id, { method: 'DELETE' });
 }
 
 
@@ -106,8 +99,8 @@ const CATEGORIAS = {
 
 // Recibe los datos tal como vienen del formulario (texto) y devuelve una lista de errores.
 // Si la lista está vacía, los datos son válidos.
-// Aunque el HTML ya valida, aquí volvemos a comprobarlo: NO hay que confiar en lo que llega.
-// Ejemplo: un nombre de dos espacios "  " pasa la validación HTML, pero aquí no.
+// Es la 2.ª barrera (la 1.ª es el HTML). El backend vuelve a validar (3.ª barrera, fase 6):
+// esta validación sirve para avisar rápido al usuario, sin esperar al servidor.
 function validarProducto(datos) {
   const errores = [];
 
@@ -164,17 +157,31 @@ function crearCelda(texto) {
   return celda;
 }
 
-// Vacía la tabla y la vuelve a dibujar con los productos del almacén
-function pintarListado() {
-  const productos = obtenerProductos();
+// Crea una fila con un único texto que ocupa toda la tabla (lista vacía o error)
+function crearFilaAviso(texto) {
+  const fila = document.createElement('tr');
+  const celda = crearCelda(texto);
+  celda.colSpan = 7;   // la celda ocupa las 7 columnas
+  fila.appendChild(celda);
+  return fila;
+}
+
+// Pide los productos al backend y vuelve a dibujar la tabla
+async function pintarListado() {
+  let productos;
+  try {
+    productos = await obtenerProductos();   // "await": espera a que llegue la respuesta del servidor
+  } catch (error) {
+    listaProductos.innerHTML = '';
+    listaProductos.appendChild(crearFilaAviso('No se ha podido cargar el listado.'));
+    mostrarMensaje(error.message, 'error');
+    return;
+  }
+
   listaProductos.innerHTML = '';   // borra las filas anteriores
 
   if (productos.length === 0) {
-    const fila = document.createElement('tr');
-    const celda = crearCelda('No hay productos. Crea el primero con el formulario.');
-    celda.colSpan = 7;   // la celda ocupa las 7 columnas
-    fila.appendChild(celda);
-    listaProductos.appendChild(fila);
+    listaProductos.appendChild(crearFilaAviso('No hay productos. Crea el primero con el formulario.'));
     return;
   }
 
@@ -201,7 +208,7 @@ function pintarListado() {
     botonEliminar.type = 'button';
     botonEliminar.textContent = 'Eliminar';
     botonEliminar.addEventListener('click', function () {
-      borrarProducto(producto.id);
+      borrarProducto(producto);
     });
 
     celdaAcciones.appendChild(botonEditar);
@@ -235,9 +242,16 @@ function leerFormulario() {
   };
 }
 
-// Pone el formulario en modo edición con los datos de un producto
-function empezarEdicion(id) {
-  const producto = obtenerProducto(id);
+// Pide al backend los datos actuales de un producto y pone el formulario en modo edición
+async function empezarEdicion(id) {
+  let producto;
+  try {
+    producto = await obtenerProducto(id);
+  } catch (error) {
+    mostrarMensaje(error.message, 'error');
+    return;
+  }
+
   formulario.nombre.value = producto.nombre;
   formulario.marca.value = producto.marca;
   formulario.categoria.value = producto.categoria;
@@ -245,7 +259,7 @@ function empezarEdicion(id) {
   formulario.stock.value = producto.stock;
   formulario.descripcion.value = producto.descripcion;
 
-  idEnEdicion = id;
+  idEnEdicion = producto.id;
   tituloFormulario.textContent = 'Editar producto';
   botonGuardar.textContent = 'Guardar cambios';
   borrarMensaje();
@@ -262,22 +276,26 @@ function salirModoEdicion() {
   botonGuardar.textContent = 'Guardar';
 }
 
-// Pide confirmación y elimina un producto
-function borrarProducto(id) {
-  const producto = obtenerProducto(id);
+// Pide confirmación y pide al backend que elimine un producto
+async function borrarProducto(producto) {
   // confirm() muestra una ventanita con "Aceptar" y "Cancelar"; devuelve true si se acepta
   if (!confirm('¿Seguro que quieres eliminar «' + producto.nombre + '»?')) {
     return;
   }
 
-  eliminarProducto(id);
+  try {
+    await eliminarProducto(producto.id);
+  } catch (error) {
+    mostrarMensaje(error.message, 'error');
+    return;
+  }
 
   // Si se estaba editando justo ese producto, el formulario ya no tiene sentido
-  if (idEnEdicion === id) {
+  if (idEnEdicion === producto.id) {
     formulario.reset();
   }
 
-  pintarListado();
+  await pintarListado();
   mostrarMensaje('Producto «' + producto.nombre + '» eliminado.', 'exito');
 }
 
@@ -287,7 +305,7 @@ function borrarProducto(id) {
 // ---------------------------------------------------------------------
 
 // Al enviar el formulario (botón Guardar)
-formulario.addEventListener('submit', function (evento) {
+formulario.addEventListener('submit', async function (evento) {
   // Sin esto, el navegador recargaría la página (comportamiento por defecto de un formulario)
   evento.preventDefault();
 
@@ -299,20 +317,26 @@ formulario.addEventListener('submit', function (evento) {
     return;
   }
 
-  // Los datos llegan como texto; precio y stock se guardan como números
+  // Los datos llegan como texto; precio y stock se envían como números
   datos.precio = Number(datos.precio);
   datos.stock = Number(datos.stock);
 
-  if (idEnEdicion === null) {
-    const nuevo = crearProducto(datos);
-    mostrarMensaje('Producto «' + nuevo.nombre + '» creado.', 'exito');
-  } else {
-    const actualizado = actualizarProducto(idEnEdicion, datos);
-    mostrarMensaje('Producto «' + actualizado.nombre + '» actualizado.', 'exito');
+  try {
+    if (idEnEdicion === null) {
+      const nuevo = await crearProducto(datos);
+      mostrarMensaje('Producto «' + nuevo.nombre + '» creado.', 'exito');
+    } else {
+      const actualizado = await actualizarProducto(idEnEdicion, datos);
+      mostrarMensaje('Producto «' + actualizado.nombre + '» actualizado.', 'exito');
+    }
+  } catch (error) {
+    // El servidor rechazó los datos o no respondió: se muestra el motivo y NO se vacía el formulario
+    mostrarMensaje(error.message, 'error');
+    return;
   }
 
   formulario.reset();   // vacía los campos (dispara el evento "reset" de abajo)
-  pintarListado();
+  await pintarListado();
 });
 
 // Al vaciar el formulario (botón Cancelar o formulario.reset())
@@ -320,5 +344,5 @@ formulario.addEventListener('reset', function () {
   salirModoEdicion();
 });
 
-// Al cargar la página: dibujar el listado por primera vez
+// Al cargar la página: dibujar el listado por primera vez (pidiéndolo al backend)
 pintarListado();

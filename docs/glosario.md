@@ -104,3 +104,13 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **`ValidationPipe`**: pieza de NestJS que aplica las reglas del DTO a cada petición.
 - **Whitelist (lista blanca)**: solo se aceptan los campos permitidos; el resto se rechaza.
 - **`undefined`**: en JavaScript, "esta variable o campo no tiene valor".
+
+## Fase 7
+
+- **`fetch`**: función del navegador para hacer peticiones HTTP desde JavaScript.
+- **Promesa / asincronía**: una operación que termina "más tarde"; con `await` se espera su resultado.
+- **Cliente-servidor**: modelo en el que un programa (cliente) pide y otro (servidor) responde.
+- **Origen**: protocolo + dirección + puerto de una página (`http://127.0.0.1:5500`).
+- **CORS (Cross-Origin Resource Sharing)**: regla del navegador que bloquea leer respuestas de otro origen salvo que el servidor lo permita.
+- **`Access-Control-Allow-Origin`**: cabecera con la que el servidor dice qué orígenes pueden leer sus respuestas.
+- **Petición previa (preflight)**: pregunta `OPTIONS` que el navegador hace antes de un `POST`/`PATCH` con JSON a otro origen.

@@ -205,3 +205,38 @@ En la **memoria del servidor**. Sobreviven a recargar la página, pero **se pier
 | `POST` correcto con espacios alrededor | 201, texto recortado |
 | `PATCH` solo precio | 200, el resto de campos intacto |
 | `PATCH` precio `-3` | 400 |
+
+---
+
+## Fase 7 — Conexión frontend ↔ backend y CORS (20/11/2026)
+
+### Decisiones
+- En `app.js` solo cambia **por dentro** la parte de datos: `localStorage` → `fetch` a `http://localhost:3000/productos`.
+- Las funciones de datos pasan a ser `async`; quien las llama espera con `await`.
+- CORS autorizado solo para el origen del frontend (`127.0.0.1:5500` y `localhost:5500`).
+
+### Lo aprendido
+- **Cliente-servidor**: el navegador (cliente) pide; el backend (servidor) responde. Los datos ya no están en el navegador.
+- **Asincronía**: una petición por la red tarda; `await` espera la respuesta sin congelar la página.
+- **Origen** = protocolo + dirección + puerto. `http://127.0.0.1:5500` y `http://localhost:3000` son orígenes distintos.
+- **CORS**: el navegador bloquea las respuestas de otro origen salvo que el servidor lo autorice con
+  `Access-Control-Allow-Origin`. Lo aplica el **navegador** (por eso `curl` no lo nota).
+- Orden didáctico seguido: **observar** el error → **entenderlo** → **configurarlo**.
+- Los errores del servidor (400 con lista de motivos, 404...) se convierten en mensajes visibles para el usuario.
+
+### El error de CORS, tal cual
+> Access to fetch at 'http://localhost:3000/productos' from origin 'http://127.0.0.1:5500' has been blocked by CORS policy:
+> No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+---
+
+## Cierre del bloque 2: ¿dónde viven ahora los datos y cuándo se pierden?
+
+```
+Navegador (frontend :5500) ──HTTP/JSON──▶ NestJS (:3000, array en memoria)
+```
+
+- **Dónde:** en un array dentro del proceso del servidor NestJS.
+- **Sobreviven a:** recargar la página, cerrar el navegador, usar otro navegador (todos ven los mismos datos).
+- **Se pierden al:** reiniciar el servidor (o al guardar un cambio en el backend, porque el modo watch lo reinicia).
+- **Siguiente problema a resolver:** guardar los datos en un sitio que sobreviva al servidor → **base de datos** (bloque 3).
