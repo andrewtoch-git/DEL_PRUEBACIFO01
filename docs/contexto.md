@@ -28,9 +28,9 @@
 | 2 — Backend | 7. Conexión | ✅ Completada (fetch + CORS) |
 | 3 — Base de datos | 8. MongoDB | ✅ Completada (binarios en `~/mongodb`) |
 | 3 — Base de datos | 9. Persistencia | ✅ Completada (Mongoose; frontend sin cambios) |
-| 3 — Base de datos | 10. Repaso | ⏳ Pendiente |
+| 3 — Base de datos | 10. Repaso | ✅ Completada (viaje de un dato, en `bitacora.md`) |
 
-**Fases 0–9 completadas y subidas a GitHub.** Queda la fase 10 (repaso: recorrido de un dato por todas las piezas), que el usuario no pidió todavía.
+**Proyecto completo: fases 0–10 terminadas y subidas a GitHub.**
 Para usar la aplicación hay que arrancar, en este orden: MongoDB → backend → frontend (ver apartado 2).
 
 **Dónde viven ahora los datos:** en **MongoDB**, base de datos `catalogo`, colección `productos` (ficheros en `~/mongodb/datos`).
@@ -278,6 +278,11 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - `CLAUDE.md` actualizado: MongoDB con binarios en `~/mongodb` en vez de Homebrew.
 - **Bloque 3 (salvo la fase 10 de repaso) cerrado.**
 
+**Fase 10 — Repaso**
+- Se siguió el producto "Ratón inalámbrico MX" por las 16 etapas (ida y vuelta) con `curl -v` (mismo mensaje que el navegador)
+  y `mongosh`. Tabla completa con referencias `fichero:línea` en `docs/bitacora.md`. El producto se deja en la base de datos.
+- Se mostró al usuario la web en su navegador y MongoDB en una ventana de Terminal con `mongosh`.
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -288,7 +293,7 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [ ] Revocar el token de GitHub cuando deje de usarse (se compartió en la conversación con Claude).
 - [x] Fase 3 (con `localStorage`, D17).
 - [ ] Que el usuario pruebe la aplicación en su navegador (MongoDB + backend + frontend arrancados).
-- [ ] Fase 10: repaso (recorrido de un dato por todas las piezas).
+- [x] Fase 10: repaso (recorrido de un dato por todas las piezas).
 - [ ] Opcional: los tests generados por Nest no se han adaptado (el e2e necesitaría MongoDB).
 - [x] Commit y push de la fase 3.
 - [x] Decidir el orden: se sigue el de `CLAUDE.md` (D25).

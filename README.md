@@ -50,4 +50,4 @@ Ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/catalogo`.
 | 2 — Backend | 7. Conexión | ✅ Completada |
 | 3 — Base de datos | 8. MongoDB | ✅ Completada |
 | 3 — Base de datos | 9. Persistencia | ✅ Completada |
-| 3 — Base de datos | 10. Repaso | ⏳ Pendiente |
+| 3 — Base de datos | 10. Repaso | ✅ Completada |

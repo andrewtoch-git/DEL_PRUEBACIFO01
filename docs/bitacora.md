@@ -301,3 +301,47 @@ Navegador (frontend :5500) ──HTTP/JSON──▶ NestJS (:3000) ──Mongoos
 | 1 (fase 3) | `localStorage` del navegador | Al borrar los datos del sitio; otro navegador no los ve |
 | 2 (fases 5–7) | Array en la memoria de NestJS | Al reiniciar el servidor |
 | 3 (fase 9) | MongoDB (`~/mongodb/datos`) | Solo si se borran expresamente |
+
+---
+
+## Fase 10 — Repaso: el viaje de un dato (20/11/2026)
+
+Dato seguido: el producto **"Ratón inalámbrico MX"** (Logitech, periférico, 99,99 €, stock 10).
+
+### Ida: del formulario al disco
+
+| # | Pieza | Qué pasa | Dónde |
+|---|---|---|---|
+| 1 | **Navegador · HTML** | El usuario rellena el formulario. El HTML ya comprueba lo básico (`required`, `min`...). 1.ª barrera. | `frontend/index.html` |
+| 2 | **Navegador · JS (evento)** | Al pulsar "Guardar" salta el evento `submit`; `preventDefault()` evita recargar la página. | `frontend/js/app.js:308` |
+| 3 | **Navegador · JS (validación)** | `validarProducto()` revisa las reglas (con `trim()`). 2.ª barrera. | `frontend/js/app.js:313` |
+| 4 | **Navegador · JS (datos)** | `crearProducto()` convierte el objeto en texto JSON y `fetch` lo envía. | `frontend/js/app.js:63`, `:28` |
+| 5 | **Red · HTTP** | Viaja `POST /productos` a `localhost:3000` con `Origin: http://127.0.0.1:5500` y `Content-Type: application/json`. | — |
+| 6 | **NestJS · main.ts** | El servidor escucha en el puerto del `.env`; CORS acepta ese origen. | `backend/src/main.ts:41`, `:27` |
+| 7 | **NestJS · ValidationPipe + DTO** | Comprueba el JSON con `CrearProductoDto` (y rechaza campos inventados). 3.ª barrera. | `main.ts:32`, `dto/crear-producto.dto.ts` |
+| 8 | **NestJS · Controlador** | `@Post()` asocia la ruta con `crear()`, que delega en el servicio. | `productos.controller.ts:18-21` |
+| 9 | **NestJS · Servicio** | `this.modelo.create(datos)` pide a Mongoose que lo guarde. | `productos.service.ts:38-39` |
+| 10 | **Mongoose** | Usa el esquema `Producto`, añade `creadoEn`/`actualizadoEn` y lo envía a MongoDB por la conexión de `MONGODB_URI`. | `producto.schema.ts`, `app.module.ts:13` |
+| 11 | **MongoDB** | Le pone un `_id` (`ObjectId('6b00376e…')`) y lo escribe en disco, en `~/mongodb/datos`. | `mongod` (puerto 27017) |
+
+### Vuelta: del disco a la pantalla
+
+| # | Pieza | Qué pasa |
+|---|---|---|
+| 12 | **Mongoose → NestJS** | El documento guardado vuelve al servicio y al controlador. |
+| 13 | **Esquema (`toJSON`)** | Al convertirlo en JSON, `_id` pasa a ser `id` (texto) y desaparece `_id`. |
+| 14 | **HTTP** | Respuesta `201 Created` con `Access-Control-Allow-Origin: http://127.0.0.1:5500` y el producto en JSON. |
+| 15 | **Navegador · JS** | `fetch` recibe la respuesta; se muestra "Producto «Ratón inalámbrico MX» creado." y `pintarListado()` hace un `GET /productos`. |
+| 16 | **Navegador · DOM** | El producto aparece como una fila nueva de la tabla (con `textContent`, nunca como HTML). |
+
+### Lo que se ve en cada sitio
+- **En la red (curl -v):** `> POST /productos` … `< HTTP/1.1 201 Created`, `< Access-Control-Allow-Origin: http://127.0.0.1:5500`.
+- **En MongoDB (mongosh):** `{ _id: ObjectId('6b00376e50d601ab14920c1d'), nombre: 'Ratón inalámbrico MX', ..., creadoEn: ISODate(...) }`.
+- **En el navegador:** `{ ..., "id": "6b00376e50d601ab14920c1d" }` → una fila más en la tabla.
+
+### Visión global
+- Cada pieza tiene **una** responsabilidad: HTML (estructura), CSS (aspecto), JS (comportamiento), HTTP (transporte),
+  NestJS (reglas y API), Mongoose (traducción), MongoDB (guardar).
+- El mismo dato se **valida tres veces** (HTML, JS, backend): las dos primeras ayudan al usuario; la última protege los datos.
+- Cambiar dónde se guardan los datos (`localStorage` → array → MongoDB) solo obligó a tocar la pieza responsable.
+- Hay **tres servidores** a la vez, cada uno en su puerto: `live-server` (5500), NestJS (3000) y MongoDB (27017).
