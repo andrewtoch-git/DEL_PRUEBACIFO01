@@ -24,7 +24,7 @@
 | 1 — Frontend | 3. Comportamiento (JS) | ✅ Completada (CRUD con `localStorage`, 19 pruebas automáticas + prueba de recarga) |
 | 2 — Backend | 4. Backend mínimo | ✅ Completada |
 | 2 — Backend | 5. API en memoria | ✅ Completada |
-| 2 — Backend | 6. Validación | ⏳ Pendiente |
+| 2 — Backend | 6. Validación | ✅ Completada |
 | 2 — Backend | 7. Conexión | ⏳ Pendiente |
 | 3 — Base de datos | 8–10 | ⏳ Pendiente |
 
@@ -90,6 +90,9 @@ actividad01/
 │       ├── app.service.ts
 │       └── productos/      ← recurso productos (fase 5)
 │           ├── producto.ts               ← interfaz: forma de un producto
+│           ├── dto/                      ← reglas de entrada (fase 6)
+│           │   ├── crear-producto.dto.ts
+│           │   └── actualizar-producto.dto.ts
 │           ├── productos.module.ts
 │           ├── productos.controller.ts   ← rutas /productos (CRUD)
 │           └── productos.service.ts      ← lógica + datos
@@ -137,6 +140,8 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D28 | Se añaden `node_modules/` y `dist/` al `.gitignore` de la raíz. | Con `--skip-git` la CLI no creó `.gitignore`; sin esto se subirían cientos de MB de librerías. | Claude |
 | D29 | Los tests generados por Nest se conservan sin usar (solo se actualizó el texto esperado del saludo). | Tests fuera de alcance; borrarlos obligaría a tocar más configuración. | Claude (delegado) |
 | D30 | API en memoria: array en `ProductosService` con 3 productos de ejemplo e `id` numérico (`siguienteId`). `ParseIntPipe` convierte `:id` a número (400 si no lo es). `NotFoundException` → 404. `DELETE` responde 204. Nombres de métodos en español (`crear`, `listar`, `obtenerUno`, `actualizar`, `eliminar`). | Lo pedido en `CLAUDE.md` 5.2; códigos de estado estándar. | Claude (delegado) |
+| D31 | Validación con DTO + `class-validator` y `class-transformer` (instalados en `backend/`). `ValidationPipe` global con `whitelist`, `forbidNonWhitelisted` y `transform`. Mensajes en español. Los textos se recortan (`trim`) con `@Transform`. `ActualizarProductoDto` repite las reglas con `@IsOptional` en vez de usar `PartialType` (evita otra librería). | Reglas de `CLAUDE.md` 5.1; "no confiar en lo que llega del cliente". | Claude (delegado) |
+| D32 | En `actualizar`, se copian solo los campos con valor (no `Object.assign`). | Error detectado: con `transform: true` y `target ES2023`, los campos no enviados existen como `undefined` y borraban los datos. | Claude |
 
 ---
 
@@ -216,6 +221,13 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - Recurso `productos` (módulo, controlador, servicio, interfaz `Producto`) registrado en `AppModule` (D30).
 - Pruebas con `curl`: listar 200, uno 200, crear 201, editar 200, eliminar 204, no existe 404, id no numérico 400.
 - Lección: un `POST` con `{"nombre":"","precio":"gratis","hackeo":true}` se aceptó (201) → hace falta validar (fase 6).
+
+**Fase 6 — Validación**
+- `npm install class-validator class-transformer`. DTOs `CrearProductoDto` y `ActualizarProductoDto`; `ValidationPipe` global (D31).
+- Pruebas con `curl`: datos basura → 400 con 9 mensajes (incluido "property hackeo should not exist"); nombre de 2 espacios → 400;
+  precio con 3 decimales y stock 2.5 → 400; creación correcta → 201 con espacios recortados y descripción `""`.
+- **Error encontrado y corregido:** `PATCH {"precio":999.5}` dejaba el producto como `{"id":1,"precio":999.5}` (D32).
+  Tras corregirlo, el PATCH cambia solo lo enviado.
 
 ## 6. Pendientes y preguntas abiertas
 

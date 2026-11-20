@@ -173,3 +173,35 @@ Navegador (HTML + CSS + JS) ──▶ localStorage (en ese mismo navegador)
 
 ### ¿Dónde viven ahora los datos?
 En la **memoria del servidor**. Sobreviven a recargar la página, pero **se pierden al reiniciar el servidor**.
+
+---
+
+## Fase 6 — Validación con DTO (20/11/2026)
+
+### Decisiones
+- Librerías `class-validator` (reglas) y `class-transformer` (convertir el JSON en objeto del DTO).
+- Dos DTO: `CrearProductoDto` (campos obligatorios salvo descripción) y `ActualizarProductoDto` (todo opcional).
+- `ValidationPipe` global: rechaza campos desconocidos y recorta espacios en los textos.
+
+### Lo aprendido
+- Un **DTO** describe qué datos se aceptan y con qué reglas. Si no se cumplen, NestJS responde **400** sin llegar al servicio.
+- **No confiar en el cliente**: la validación del frontend se puede saltar (con `curl`, por ejemplo). El backend es la última barrera.
+- Tres barreras para el mismo dato: HTML → JavaScript del navegador → backend.
+- `whitelist` + `forbidNonWhitelisted`: un campo inventado (`"hackeo"`) se rechaza.
+
+### Error encontrado (y lección)
+- **Síntoma:** `PATCH /productos/1` con `{"precio":999.5}` dejó el producto como `{"id":1,"precio":999.5}`.
+- **Causa:** con `transform: true`, el DTO es un objeto de clase; en TypeScript moderno, los campos declarados existen
+  aunque no se envíen (con valor `undefined`). `Object.assign` los copiaba y borraba los datos buenos.
+- **Solución:** copiar solo los campos que traen valor.
+- **Lección:** probar también los casos "normales" (un PATCH parcial), no solo los errores.
+
+### Pruebas con curl
+| Petición | Resultado |
+|---|---|
+| `POST` datos basura (`"gratis"`, `"hackeo"`) | 400 con la lista de errores |
+| `POST` nombre `"  "` | 400 |
+| `POST` precio `1.999`, stock `2.5` | 400 |
+| `POST` correcto con espacios alrededor | 201, texto recortado |
+| `PATCH` solo precio | 200, el resto de campos intacto |
+| `PATCH` precio `-3` | 400 |

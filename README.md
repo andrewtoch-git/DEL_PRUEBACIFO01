@@ -35,7 +35,7 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 | 1 — Frontend | 3. Comportamiento | ✅ Completada (CRUD con `localStorage`) |
 | 2 — Backend | 4. Backend mínimo | ✅ Completada |
 | 2 — Backend | 5. API en memoria | ✅ Completada |
-| 2 — Backend | 6. Validación | ⏳ Pendiente |
+| 2 — Backend | 6. Validación | ✅ Completada |
 | 2 — Backend | 7. Conexión | ⏳ Pendiente |
 | 3 — Base de datos | 8. MongoDB | ⏳ Pendiente |
 | 3 — Base de datos | 9. Persistencia | ⏳ Pendiente |

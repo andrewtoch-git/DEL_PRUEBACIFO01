@@ -95,3 +95,12 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **Excepción**: aviso de error que interrumpe la función; NestJS la convierte en una respuesta HTTP de error.
 - **Pipe (NestJS)**: pieza que transforma o comprueba un dato antes de que llegue al controlador (`ParseIntPipe`).
 - **Interfaz (TypeScript)**: descripción de la forma de un objeto (qué campos tiene y de qué tipo).
+
+## Fase 6
+
+- **DTO (Data Transfer Object)**: clase que describe qué datos acepta una petición y con qué reglas.
+- **Validación en el servidor**: comprobar los datos en el backend, aunque el frontend ya los haya comprobado.
+- **`class-validator`**: librería de decoradores de reglas (`@IsString`, `@Length`, `@Min`, `@IsIn`...).
+- **`ValidationPipe`**: pieza de NestJS que aplica las reglas del DTO a cada petición.
+- **Whitelist (lista blanca)**: solo se aceptan los campos permitidos; el resto se rechaza.
+- **`undefined`**: en JavaScript, "esta variable o campo no tiene valor".

@@ -7,14 +7,18 @@
 //   DELETE /productos/:id  → eliminar
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { ProductosService } from './productos.service.js';
-import type { Producto } from './producto.js';
+// Importación normal (no "import type"): ValidationPipe necesita las CLASES de los DTO para leer sus reglas
+import { CrearProductoDto } from './dto/crear-producto.dto.js';
+import { ActualizarProductoDto } from './dto/actualizar-producto.dto.js';
 
 @Controller('productos')   // todas las rutas de esta clase empiezan por /productos
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
   @Post()   // responde 201 (Created) por defecto
-  crear(@Body() datos: Omit<Producto, 'id'>) {   // @Body() = el JSON que envía el cliente
+  // @Body() = el JSON que envía el cliente. Al indicar el tipo CrearProductoDto,
+  // ValidationPipe comprueba sus reglas ANTES de entrar aquí (si fallan → 400).
+  crear(@Body() datos: CrearProductoDto) {
     return this.productosService.crear(datos);
   }
 
@@ -31,7 +35,7 @@ export class ProductosController {
   }
 
   @Patch(':id')
-  actualizar(@Param('id', ParseIntPipe) id: number, @Body() datos: Partial<Omit<Producto, 'id'>>) {
+  actualizar(@Param('id', ParseIntPipe) id: number, @Body() datos: ActualizarProductoDto) {
     return this.productosService.actualizar(id, datos);
   }
 

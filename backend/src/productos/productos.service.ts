@@ -3,6 +3,8 @@
 // → Sobreviven a recargar la página, pero se pierden al reiniciar el servidor.
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { Producto } from './producto.js';
+import type { CrearProductoDto } from './dto/crear-producto.dto.js';
+import type { ActualizarProductoDto } from './dto/actualizar-producto.dto.js';
 
 @Injectable()
 export class ProductosService {
@@ -29,18 +31,26 @@ export class ProductosService {
     return producto;
   }
 
-  // Omit<Producto, 'id'> = un producto SIN el id (el id lo pone el servidor, no el cliente)
-  crear(datos: Omit<Producto, 'id'>): Producto {
-    const nuevo: Producto = { id: this.siguienteId, ...datos };
+  // Los datos ya llegan VALIDADOS (fase 6). El id lo pone el servidor, nunca el cliente.
+  crear(datos: CrearProductoDto): Producto {
+    // Si no viene descripción, se guarda como texto vacío
+    const nuevo: Producto = { id: this.siguienteId, ...datos, descripcion: datos.descripcion ?? '' };
     this.siguienteId++;
     this.productos.push(nuevo);
     return nuevo;
   }
 
-  // Partial<...> = todos los campos opcionales: PATCH permite cambiar solo algunos
-  actualizar(id: number, datos: Partial<Omit<Producto, 'id'>>): Producto {
+  // PATCH: solo llegan los campos que cambian (todos opcionales en ActualizarProductoDto)
+  actualizar(id: number, datos: ActualizarProductoDto): Producto {
     const producto = this.obtenerUno(id);   // si no existe, lanza el 404
-    Object.assign(producto, datos);          // copia en el producto solo los campos recibidos
+
+    // Copiamos SOLO los campos que traen valor. Los que no se enviaron existen en el DTO
+    // con valor undefined, y si los copiáramos borrarían los datos buenos (error visto en la fase 6).
+    for (const [campo, valor] of Object.entries(datos)) {
+      if (valor !== undefined) {
+        (producto as unknown as Record<string, unknown>)[campo] = valor;
+      }
+    }
     return producto;
   }
 
