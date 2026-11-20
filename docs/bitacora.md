@@ -143,3 +143,33 @@ Navegador (HTML + CSS + JS) ──▶ localStorage (en ese mismo navegador)
 ### Verificación
 - `curl -i http://localhost:3000/` → `HTTP/1.1 200 OK` y `¡Hola desde el backend!`.
 - Al cambiar el texto en `app.service.ts`, el servidor (modo `--watch`) se reinicia solo y responde el texto nuevo.
+
+---
+
+## Fase 5 — API REST en memoria (20/11/2026)
+
+### Decisiones
+- Los productos viven en un **array dentro de `ProductosService`**, con 3 de ejemplo e `id` numérico que va subiendo.
+- Rutas de `CLAUDE.md` 5.2 en `ProductosController`; `ParseIntPipe` convierte el `:id` a número.
+
+### Lo aprendido
+- **Endpoint** = ruta + método HTTP. El mismo `/productos/4` hace cosas distintas con `GET`, `PATCH` o `DELETE`.
+- **Códigos de estado**: `200` OK, `201` creado, `204` hecho sin contenido, `400` petición mal formada, `404` no existe.
+- El cliente envía **JSON** en el cuerpo (`-d '{...}'` con `Content-Type: application/json`) y el servidor responde JSON.
+- Si se lanza `NotFoundException`, NestJS responde un 404 con un JSON explicativo.
+- **Sin validación, el servidor se lo cree todo**: aceptó un nombre vacío, un precio "gratis" y un campo inventado.
+
+### Pruebas con curl
+| Petición | Resultado |
+|---|---|
+| `GET /productos` | 200, lista de 3 |
+| `GET /productos/2` | 200 |
+| `POST /productos` | 201, id 4 |
+| `PATCH /productos/4` `{"precio":649}` | 200 |
+| `DELETE /productos/2` | 204 |
+| `GET /productos/2` | 404 |
+| `GET /productos/abc` | 400 |
+| `POST` con datos basura | **201** (el problema que resuelve la fase 6) |
+
+### ¿Dónde viven ahora los datos?
+En la **memoria del servidor**. Sobreviven a recargar la página, pero **se pierden al reiniciar el servidor**.

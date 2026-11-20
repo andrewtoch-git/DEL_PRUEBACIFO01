@@ -82,3 +82,16 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **`async` / `await`**: forma de esperar a que termine algo que lleva tiempo sin bloquear el programa.
 - **Cabeceras HTTP**: información que acompaña a una petición o respuesta (tipo de contenido, fecha...). Se ven con `curl -i`.
 - **Modo watch**: el servidor vigila los ficheros y se reinicia solo al guardarlos.
+
+## Fase 5
+
+- **API**: conjunto de "puertas" (endpoints) que un programa ofrece para que otros le pidan cosas.
+- **REST**: estilo de API que usa URLs para los recursos (`/productos`) y métodos HTTP para las acciones.
+- **Endpoint**: combinación de ruta y método HTTP (`GET /productos`).
+- **Métodos HTTP**: `GET` (leer), `POST` (crear), `PATCH` (modificar parte), `DELETE` (eliminar).
+- **Parámetro de ruta**: trozo variable de una URL, como el `4` de `/productos/4` (`:id`).
+- **Cuerpo (body)**: los datos que viajan dentro de una petición `POST` o `PATCH`, normalmente en JSON.
+- **Códigos 201 / 204 / 400**: creado / hecho sin contenido / petición incorrecta.
+- **Excepción**: aviso de error que interrumpe la función; NestJS la convierte en una respuesta HTTP de error.
+- **Pipe (NestJS)**: pieza que transforma o comprueba un dato antes de que llegue al controlador (`ParseIntPipe`).
+- **Interfaz (TypeScript)**: descripción de la forma de un objeto (qué campos tiene y de qué tipo).

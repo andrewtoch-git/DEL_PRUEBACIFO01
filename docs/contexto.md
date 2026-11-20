@@ -23,7 +23,7 @@
 | 1 — Frontend | 2. Presentación (CSS) | ✅ Completada (verificada con capturas de Chrome headless) |
 | 1 — Frontend | 3. Comportamiento (JS) | ✅ Completada (CRUD con `localStorage`, 19 pruebas automáticas + prueba de recarga) |
 | 2 — Backend | 4. Backend mínimo | ✅ Completada |
-| 2 — Backend | 5. API en memoria | ⏳ Pendiente |
+| 2 — Backend | 5. API en memoria | ✅ Completada |
 | 2 — Backend | 6. Validación | ⏳ Pendiente |
 | 2 — Backend | 7. Conexión | ⏳ Pendiente |
 | 3 — Base de datos | 8–10 | ⏳ Pendiente |
@@ -87,7 +87,12 @@ actividad01/
 │       ├── main.ts         ← arranque: crea la app y escucha en el puerto 3000
 │       ├── app.module.ts   ← módulo raíz
 │       ├── app.controller.ts ← GET / → "¡Hola desde el backend!"
-│       └── app.service.ts
+│       ├── app.service.ts
+│       └── productos/      ← recurso productos (fase 5)
+│           ├── producto.ts               ← interfaz: forma de un producto
+│           ├── productos.module.ts
+│           ├── productos.controller.ts   ← rutas /productos (CRUD)
+│           └── productos.service.ts      ← lógica + datos
 └── frontend/
     ├── index.html          ← formulario + tabla con 3 productos de ejemplo (fase 1)
     ├── css/estilos.css     ← estilos (fase 2)
@@ -131,6 +136,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D27 | Limpieza de lo que añadió la CLI 12 sin pedirlo: se desinstalan `@nestjs/observe` (monitorización externa) y `@nestjs/mau` (despliegue), se quita el script `deploy` y se borran `backend/CLAUDE.md`, `AGENTS.md`, `.claude/skills/` y `.agents/skills/`. | Piezas no previstas; los ficheros para agentes de IA contenían instrucciones que chocaban con las del profesor. | Usuario (aprobó al pedir terminar las fases) |
 | D28 | Se añaden `node_modules/` y `dist/` al `.gitignore` de la raíz. | Con `--skip-git` la CLI no creó `.gitignore`; sin esto se subirían cientos de MB de librerías. | Claude |
 | D29 | Los tests generados por Nest se conservan sin usar (solo se actualizó el texto esperado del saludo). | Tests fuera de alcance; borrarlos obligaría a tocar más configuración. | Claude (delegado) |
+| D30 | API en memoria: array en `ProductosService` con 3 productos de ejemplo e `id` numérico (`siguienteId`). `ParseIntPipe` convierte `:id` a número (400 si no lo es). `NotFoundException` → 404. `DELETE` responde 204. Nombres de métodos en español (`crear`, `listar`, `obtenerUno`, `actualizar`, `eliminar`). | Lo pedido en `CLAUDE.md` 5.2; códigos de estado estándar. | Claude (delegado) |
 
 ---
 
@@ -205,6 +211,11 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - `main.ts`, `app.module.ts`, `app.controller.ts`, `app.service.ts` reescritos limpios y comentados.
 - Experimento: el saludo pasa de "Hello World!" a "¡Hola desde el backend!".
 - Verificado con `curl -i http://localhost:3000/` → `HTTP/1.1 200 OK`, `¡Hola desde el backend!`.
+
+**Fase 5 — API en memoria**
+- Recurso `productos` (módulo, controlador, servicio, interfaz `Producto`) registrado en `AppModule` (D30).
+- Pruebas con `curl`: listar 200, uno 200, crear 201, editar 200, eliminar 204, no existe 404, id no numérico 400.
+- Lección: un `POST` con `{"nombre":"","precio":"gratis","hackeo":true}` se aceptó (201) → hace falta validar (fase 6).
 
 ## 6. Pendientes y preguntas abiertas
 
