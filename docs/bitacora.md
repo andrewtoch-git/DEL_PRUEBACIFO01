@@ -58,7 +58,7 @@ Decisiones tomadas y lo aprendido en cada fase.
 
 ---
 
-## Fase 2 — Presentación CSS (20/11/2026) — pendiente de revisión
+## Fase 2 — Presentación CSS (20/11/2026)
 
 ### Decisiones
 - Fichero `css/estilos.css`, enlazado con `<link>`: es el **único cambio** en el HTML.
@@ -70,3 +70,11 @@ Decisiones tomadas y lo aprendido en cada fase.
 - **Separar estructura y presentación**: el HTML dice qué hay; el CSS, cómo se ve.
 - Selectores, variables CSS y *media queries*.
 - Con las DevTools (panel *Styles*) se ve qué reglas afectan a cada elemento.
+
+### Verificación
+- Capturas con Chrome en modo *headless* (sin ventana) a 1280 px y 600 px de ancho.
+- Escritorio: cabecera, tarjetas, formulario, tabla y colores de los botones correctos.
+- Pantalla estrecha: el formulario se adapta y la tabla se desplaza en horizontal dentro de su tarjeta, como se diseñó.
+- Curiosidad: Chrome *headless* no baja de 500 px de ancho; una captura a 400 px sale recortada y parece un fallo que no existe.
+  Moraleja: comprobar la herramienta de verificación antes de culpar al código.
+- Mejora opcional detectada (no aplicada): en pantallas estrechas el precio se parte en dos líneas ("1199,00 / €").

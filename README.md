@@ -25,7 +25,7 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 |---|---|---|
 | 1 — Frontend | 0. Entorno mínimo | ✅ Completada |
 | 1 — Frontend | 1. Estructura | ✅ Completada |
-| 1 — Frontend | 2. Presentación | 🔄 Hecha, pendiente de revisión |
+| 1 — Frontend | 2. Presentación | ✅ Completada |
 | 1 — Frontend | 3. Comportamiento | ⏳ Pendiente |
 | 2 — Backend | 4. Backend mínimo | ⏳ Pendiente |
 | 2 — Backend | 5. API en memoria | ⏳ Pendiente |

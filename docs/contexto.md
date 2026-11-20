@@ -20,13 +20,14 @@
 |---|---|---|
 | 1 — Frontend | 0. Entorno mínimo | ✅ Completada |
 | 1 — Frontend | 1. Estructura (HTML) | ✅ Completada |
-| 1 — Frontend | 2. Presentación (CSS) | 🔄 Hecha, pendiente de que la revises en el navegador |
+| 1 — Frontend | 2. Presentación (CSS) | ✅ Completada (verificada con capturas de Chrome headless) |
 | 1 — Frontend | 3. Comportamiento (JS) | ⏳ Pendiente |
 | 2 — Backend | 4–7 | ⏳ Pendiente |
 | 3 — Base de datos | 8–10 | ⏳ Pendiente |
 
 **Siguiente paso:** ⏸️ **En pausa por indicación del usuario: no avanzar hasta que lo pida.**
-Cuando se retome: revisar el estilo de la fase 2 → cerrar fase 2 → plan de la fase 3 (JavaScript: CRUD con `localStorage` según D17, listado, crear, editar, eliminar, validar).
+Cuando se retome: plan de la fase 3 (JavaScript: CRUD con `localStorage` según D17, listado, crear, editar, eliminar, validar).
+Hay cambios en `README.md`, `docs/bitacora.md` y `docs/contexto.md` **sin commit** (cierre de la fase 2 y registro del push): preguntar si se guardan y se suben.
 
 **Dónde viven ahora los datos:** escritos a mano dentro de `index.html` (3 productos de ejemplo). No hay datos "vivos" todavía.
 En la fase 3 vivirán en el `localStorage` del navegador (D17): sobreviven a recargar, pero solo existen en ese navegador de ese equipo.
@@ -100,7 +101,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D17 | **El CRUD de la fase 3 usa `localStorage`** (opción A: directamente, sin pasar antes por un array en memoria). Se acuerda la excepción a `CLAUDE.md` 5.4, que lo ponía fuera de alcance. | Decisión del usuario. Consecuencia aceptada: en el bloque 1 los datos **no** se pierden al recargar; el motivo del backend pasa a ser compartir los datos entre navegadores/equipos. | Usuario |
 | D18 | **Se usa Git** (repositorio local, sin remotos). Se instala mediante las Command Line Tools de Apple (`xcode-select --install`). Autor de los commits: `andres <andresrodriguezinfo@gmail.com>`, configurado solo para este repositorio. Los commits llevan la línea `Co-Authored-By: Claude`. Primer commit titulado "fase 1", aunque incluye también la fase 2. Se actualiza `CLAUDE.md` (apartados 4 y 5.4), que antes prohibía Git. | Petición del usuario: llevar control de versiones del proyecto. | Usuario |
 | D19 | Se crea `.gitignore` con `.DS_Store`. | Finder crea esos ficheros solo; no son del proyecto. | Usuario |
-| D20 | **Repositorio conectado a GitHub**: `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (remoto `origin`, **público**). Autenticación por **HTTPS + token personal**, guardado en el llavero de macOS; el primer `push` lo hace el usuario en la app Terminal. Se mantiene el email real en los commits (visible públicamente, aceptado por el usuario). Se actualiza `CLAUDE.md` (apartado 4). | Petición del usuario. HTTPS + token elegido frente a SSH. | Usuario |
+| D20 | **Repositorio conectado a GitHub**: `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (remoto `origin`, **público**). Autenticación por **HTTPS + token personal**, guardado en el llavero de macOS (lo guardó Claude a petición del usuario). Se mantiene el email real en los commits (visible públicamente, aceptado por el usuario). Se actualiza `CLAUDE.md` (apartado 4). | Petición del usuario. HTTPS + token elegido frente a SSH. | Usuario |
 
 ---
 
@@ -129,7 +130,9 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 **Fase 2 — Presentación (CSS)**
 - Creado `frontend/css/estilos.css` y enlazado con `<link>` en `index.html` (única línea añadida al HTML) (D14).
 - Verificado que el servidor entrega `index.html` y `estilos.css` con `200`.
-- Pendiente: revisión visual por parte del usuario.
+- Revisión visual hecha por Claude (el usuario estaba en pausa) con capturas de Chrome headless: correcta en escritorio y en pantalla estrecha.
+  Una primera captura a 400 px parecía rota: Chrome headless no baja de 500 px de ancho (artefacto de la herramienta, no del CSS).
+- **Fase 2 cerrada.**
 
 **Creado este fichero** `docs/contexto.md` (D15) y **modificado `CLAUDE.md`** para incluirlo (D16).
 Actualizados también `bitacora.md` (fases 1 y 2), `glosario.md` (términos de las fases 1 y 2) y `README.md`.
@@ -142,14 +145,21 @@ El usuario pidió **no avanzar ningún paso** por ahora.
 repositorio y se hizo el **primer commit, "fase 1"** (`ccb1b7d`), con todo el proyecto hasta la fase 2.
 Los `.DS_Store` quedaron fuera; después se creó `.gitignore` para ignorarlos (D19) y se guardó en el commit "Añadir .gitignore".
 
+**GitHub (D20):** se añadió el remoto `origin` y se hizo el commit "Conectar con GitHub". El primer `push` sin credenciales falló
+(`could not read Username`: GitHub exige identificarse para subir). El usuario creó un token *fine-grained* y se lo pasó a Claude,
+que lo guardó en el llavero de macOS con `git credential approve` (no está en la URL ni en ningún fichero) e hizo
+`git push -u origin main`. Verificado: GitHub tiene los 3 commits (`5f6dbe3` en `main`) y `main` sigue a `origin/main`.
+
 ---
 
 ## 6. Pendientes y preguntas abiertas
 
-- [ ] Revisar en el navegador el estilo de la fase 2 y pedir cambios si hace falta.
-- [ ] Cerrar fase 2 (bitácora, glosario, README).
+- [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
+- [x] Cerrar fase 2 (bitácora, glosario, README).
+- [ ] Opcional: evitar que el precio se parta en dos líneas en pantallas estrechas.
 - [x] Instalar Git y hacer el primer commit "fase 1" (D18).
-- [ ] Conectar con GitHub y hacer el primer `push` (D20): crear token → `push` desde Terminal → verificar en la web.
+- [x] Conectar con GitHub y hacer el primer `push` (D20).
+- [ ] Revocar el token de GitHub cuando deje de usarse (se compartió en la conversación con Claude).
 - [ ] Plan de la fase 3 (con `localStorage`, D17).
 - [ ] Decidir si se actualiza `CLAUDE.md` 5.4 para reflejar la excepción de `localStorage` (de momento solo consta en D17).
 - [ ] Bloque 3: decidir cómo instalar MongoDB sin Homebrew ni permisos de administrador.
