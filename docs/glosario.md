@@ -137,3 +137,8 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **Variable de entorno**: valor de configuración que el programa lee al arrancar (`process.env.MONGODB_URI`).
 - **`.env`**: fichero con variables de entorno; se mantiene fuera de Git porque depende del equipo o contiene secretos.
 - **Separación de responsabilidades**: cada pieza hace una sola cosa; por eso cambiar dónde se guardan los datos no obliga a tocar el frontend.
+
+## Herramientas extra
+
+- **MongoDB Compass**: aplicación con ventanas para ver y editar los datos de MongoDB sin escribir comandos (alternativa visual a `mongosh`).
+- **`.dmg`**: "imagen de disco" de macOS; se monta como un disco virtual y de dentro se copia la aplicación.

@@ -54,6 +54,7 @@ Para usar la aplicación hay que arrancar, en este orden: MongoDB → backend �
 | CLI de Nest | `@nestjs/cli` 12.0.15, instalada con `npm install -g` en `~/.npm-global` (carpeta personal, ya en el PATH; no requiere administrador). |
 | Backend | NestJS 12 en `backend/`, puerto **3000**. Proyecto en modo ESM (las importaciones terminan en `.js`). |
 | MongoDB | **8.0.38** (servidor `mongod`) y **mongosh 2.14.1**, binarios oficiales en `~/mongodb/bin` (sin Homebrew ni administrador; no están en el PATH, se usan con la ruta completa). Datos en `~/mongodb/datos`, registro en `~/mongodb/mongod.log`. Escucha solo en `127.0.0.1:27017`. |
+| Visor de MongoDB | **MongoDB Compass 1.53.2** en `~/Applications` (`.dmg` oficial de GitHub, verificado con SHA-256). Conexión: `mongodb://127.0.0.1:27017/catalogo`. |
 | GitHub | Remoto `origin` → `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (público). Token personal en el llavero de macOS (D20). |
 
 ### Arrancar el frontend
@@ -163,6 +164,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D39 | Al enviar JSON, el `_id` se convierte en `id` (texto) y se quita `_id`. Un id con formato imposible responde 404 (igual que uno inexistente). | Que el **frontend no cambie**: sigue usando `producto.id`. | Claude (delegado) |
 | D40 | Configuración en `backend/.env` (`MONGODB_URI`, `PORT`), leído con `process.loadEnvFile()` de Node (sin librería extra) y `MongooseModule.forRootAsync`. Se sube `.env.example`; `.env` va al `.gitignore`. | `CLAUDE.md` 6: configuración separada del código; menos dependencias. | Claude (delegado) |
 | D41 | La colección empieza vacía; los 3 productos de ejemplo se crearon **a través de la API** con `curl`. | Ejercitar el `POST` real contra la base de datos. | Claude (delegado) |
+| D42 | Visor gráfico: **MongoDB Compass 1.53.2** (previsto en `CLAUDE.md` 4.1), instalado en `~/Applications` copiándolo del `.dmg` oficial, sin administrador. No la 1.53.3, publicada ese mismo día. | Petición del usuario: ver los datos con una interfaz visual. | Usuario |
 
 ---
 
@@ -282,6 +284,7 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - Se siguió el producto "Ratón inalámbrico MX" por las 16 etapas (ida y vuelta) con `curl -v` (mismo mensaje que el navegador)
   y `mongosh`. Tabla completa con referencias `fichero:línea` en `docs/bitacora.md`. El producto se deja en la base de datos.
 - Se mostró al usuario la web en su navegador y MongoDB en una ventana de Terminal con `mongosh`.
+- A petición del usuario, se instaló y abrió **MongoDB Compass** como visor gráfico (D42).
 
 ## 6. Pendientes y preguntas abiertas
 

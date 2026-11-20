@@ -32,7 +32,9 @@ MongoDB está instalado en `~/mongodb` (binarios oficiales; ver `docs/contexto.m
 ```
 ~/mongodb/bin/mongod --dbpath ~/mongodb/datos --bind_ip 127.0.0.1 --port 27017 --logpath ~/mongodb/mongod.log
 ```
-Ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/catalogo`.
+Ver los datos:
+- En la terminal: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/catalogo`.
+- Con interfaz visual: abrir **MongoDB Compass** (en `~/Applications`) y conectar a `mongodb://127.0.0.1:27017`.
 
 **Orden de arranque:** MongoDB → backend → frontend.
 
