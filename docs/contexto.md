@@ -58,7 +58,9 @@ Abrir `http://127.0.0.1:5500`. Parar con **Ctrl+C**. El servidor solo funciona m
 
 ```
 actividad01/
-├── CLAUDE.md               ← instrucciones del profesor
+├── .git/                   ← repositorio de Git (oculto; guarda la historia)
+├── .gitignore              ← ficheros que Git ignora (.DS_Store)
+├── CLAUDE.md               ← instrucciones del profesor (adaptado: D16, D18)
 ├── README.md               ← arranque y estado de las fases
 ├── docs/
 │   ├── contexto.md         ← ESTE fichero
@@ -96,6 +98,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D16 | Se modifica `CLAUDE.md`: nueva regla 3.6 (leer y actualizar `contexto.md`), servidor local confirmado (`live-server`), raíz `actividad01/`, `contexto.md` en la estructura y en el cierre de fases/sesiones, y aviso sobre Homebrew en el bloque 3. | Que cualquier sesión nueva tenga en cuenta el registro y las decisiones. | Usuario |
 | D17 | **El CRUD de la fase 3 usa `localStorage`** (opción A: directamente, sin pasar antes por un array en memoria). Se acuerda la excepción a `CLAUDE.md` 5.4, que lo ponía fuera de alcance. | Decisión del usuario. Consecuencia aceptada: en el bloque 1 los datos **no** se pierden al recargar; el motivo del backend pasa a ser compartir los datos entre navegadores/equipos. | Usuario |
 | D18 | **Se usa Git** (repositorio local, sin remotos). Se instala mediante las Command Line Tools de Apple (`xcode-select --install`). Autor de los commits: `andres <andresrodriguezinfo@gmail.com>`, configurado solo para este repositorio. Los commits llevan la línea `Co-Authored-By: Claude`. Primer commit titulado "fase 1", aunque incluye también la fase 2. Se actualiza `CLAUDE.md` (apartados 4 y 5.4), que antes prohibía Git. | Petición del usuario: llevar control de versiones del proyecto. | Usuario |
+| D19 | Se crea `.gitignore` con `.DS_Store`. | Finder crea esos ficheros solo; no son del proyecto. | Usuario |
 
 ---
 
@@ -134,7 +137,8 @@ El usuario pidió **no avanzar ningún paso** por ahora.
 
 **Git (D18):** el usuario pidió añadir Git antes de seguir. Se instalaron las Command Line Tools con `xcode-select --install`
 (no pidió contraseña de administrador). Se creó el repositorio con `git init`, se configuró el autor solo para este
-repositorio y se hizo el **primer commit, "fase 1"**, con todo el proyecto hasta la fase 2.
+repositorio y se hizo el **primer commit, "fase 1"** (`ccb1b7d`), con todo el proyecto hasta la fase 2.
+Los `.DS_Store` quedaron fuera; después se creó `.gitignore` para ignorarlos (D19) y se guardó en el commit "Añadir .gitignore".
 
 ---
 

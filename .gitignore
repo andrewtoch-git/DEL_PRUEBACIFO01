@@ -1,0 +1,4 @@
+# Ficheros que Git debe ignorar (no se guardan en el repositorio)
+
+# macOS: Finder crea .DS_Store en cada carpeta para recordar cómo se ve. No es parte del proyecto.
+.DS_Store
