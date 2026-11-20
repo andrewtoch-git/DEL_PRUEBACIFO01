@@ -142,3 +142,21 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 
 - **MongoDB Compass**: aplicación con ventanas para ver y editar los datos de MongoDB sin escribir comandos (alternativa visual a `mongosh`).
 - **`.dmg`**: "imagen de disco" de macOS; se monta como un disco virtual y de dentro se copia la aplicación.
+
+## Despliegue
+
+- **Desplegar (deploy)**: publicar la aplicación en servidores de Internet para que otros la usen.
+- **Render**: proveedor en la nube donde se publican el frontend (*Static Site*) y el backend (*Web Service*).
+- **Static Site**: servicio que solo entrega ficheros (HTML, CSS, JS), como `live-server` pero en Internet.
+- **Web Service**: servicio que ejecuta un programa (nuestro backend) y lo mantiene escuchando peticiones.
+- **MongoDB Atlas**: MongoDB en la nube, gestionado por la empresa MongoDB. **M0** es su plan gratuito.
+- **Cluster**: grupo de servidores que forman una base de datos en la nube.
+- **`mongodb+srv://`**: forma de cadena de conexión que usa Atlas (busca automáticamente sus servidores).
+- **CI/CD**: integración continua (probar cada cambio) y despliegue continuo (publicarlo si todo va bien).
+- **GitHub Actions**: servicio de GitHub que ejecuta workflows automáticamente (por ejemplo, en cada `push`).
+- **Workflow / job / step**: fichero de automatización / trabajo dentro de él / paso de un trabajo.
+- **YAML**: formato de texto para configuración, basado en sangrías (los ficheros `.yml`).
+- **Prueba de humo**: comprobación rápida de que lo esencial funciona tras arrancar.
+- **Deploy Hook**: URL secreta de Render que, al llamarla, publica la última versión.
+- **Secret (GitHub)**: valor cifrado del repositorio que los workflows pueden usar sin que nadie lo vea.
+- **Cold start (arranque en frío)**: espera mientras un servicio dormido del plan gratuito se vuelve a encender.

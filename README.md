@@ -38,6 +38,12 @@ Ver los datos:
 
 **Orden de arranque:** MongoDB → backend → frontend.
 
+## Despliegue en Internet (Render)
+
+Guía paso a paso: [`docs/despliegue-render.md`](docs/despliegue-render.md).
+Frontend en Render *Static Site*, backend en Render *Web Service*, base de datos en MongoDB Atlas y
+GitHub Actions (`.github/workflows/ci-cd.yml`) que prueba cada `push` y, si todo va bien, despliega.
+
 ## Estado de las fases
 
 | Bloque | Fase | Estado |

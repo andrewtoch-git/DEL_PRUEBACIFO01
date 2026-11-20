@@ -11,6 +11,9 @@
   <link rel="stylesheet" href="css/estilos.css">
   <!-- Comportamiento (fase 3). "defer" hace que el script espere a que todo el HTML esté cargado,
        así puede encontrar el formulario y la tabla. -->
+  <!-- config.js va ANTES que app.js: define a qué backend conectarse (local o Render).
+       Los scripts con "defer" se ejecutan en el orden en que aparecen. -->
+  <script src="js/config.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>

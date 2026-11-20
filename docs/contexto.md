@@ -31,6 +31,9 @@
 | 3 — Base de datos | 10. Repaso | ✅ Completada (viaje de un dato, en `bitacora.md`) |
 
 **Proyecto completo: fases 0–10 terminadas y subidas a GitHub.**
+**En curso: despliegue en Render** (D43–D47). Ficheros preparados y probados en local, **pendientes de commit**.
+Guía para el usuario: `docs/despliegue-render.md`. Lo que solo puede hacer el usuario: crear Atlas, crear los servicios
+en Render, los Deploy Hooks y los *Secrets* de GitHub, y dar al token el permiso **Workflows**.
 Para usar la aplicación hay que arrancar, en este orden: MongoDB → backend → frontend (ver apartado 2).
 
 **Dónde viven ahora los datos:** en **MongoDB**, base de datos `catalogo`, colección `productos` (ficheros en `~/mongodb/datos`).
@@ -55,6 +58,7 @@ Para usar la aplicación hay que arrancar, en este orden: MongoDB → backend �
 | Backend | NestJS 12 en `backend/`, puerto **3000**. Proyecto en modo ESM (las importaciones terminan en `.js`). |
 | MongoDB | **8.0.38** (servidor `mongod`) y **mongosh 2.14.1**, binarios oficiales en `~/mongodb/bin` (sin Homebrew ni administrador; no están en el PATH, se usan con la ruta completa). Datos en `~/mongodb/datos`, registro en `~/mongodb/mongod.log`. Escucha solo en `127.0.0.1:27017`. |
 | Visor de MongoDB | **MongoDB Compass 1.53.2** en `~/Applications` (`.dmg` oficial de GitHub, verificado con SHA-256). Conexión: `mongodb://127.0.0.1:27017/catalogo`. |
+| MongoDB Atlas | Cluster **`Cluster0`** (M0) → `cluster0.by4xinj.mongodb.net` (3 réplicas). Usuario de BD: `andresrodriguezinfo_db_user`. Base de datos: `catalogo`. **La contraseña NO se guarda aquí**: solo en el panel de Render (`MONGODB_URI`). |
 | GitHub | Remoto `origin` → `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (público). Token personal en el llavero de macOS (D20). |
 
 ### Arrancar el frontend
@@ -86,15 +90,18 @@ Consola para ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/cat
 actividad01/
 ├── .git/                   ← repositorio de Git (oculto; guarda la historia)
 ├── .gitignore              ← ficheros que Git ignora (.DS_Store, node_modules/, dist/, *.tsbuildinfo, .env)
-├── CLAUDE.md               ← instrucciones del profesor (adaptado: D16, D18)
+├── .github/workflows/ci-cd.yml ← GitHub Actions: comprobar + desplegar en Render (D45)
+├── CLAUDE.md               ← instrucciones del profesor (adaptado: D16, D18, D43)
 ├── README.md               ← arranque y estado de las fases
 ├── docs/
 │   ├── contexto.md         ← ESTE fichero
+│   ├── despliegue-render.md ← guía paso a paso del despliegue
 │   ├── bitacora.md
 │   └── glosario.md
 ├── backend/                ← NestJS (bloque 2), generado con la CLI
 │   ├── .env                ← configuración local (MONGODB_URI, PORT). NO se sube a GitHub
 │   ├── .env.example        ← plantilla del .env (sí se sube)
+│   ├── .node-version       ← versión de Node para Render y GitHub Actions (24)
 │   ├── package.json        ← dependencias y scripts (start:dev...)
 │   └── src/
 │       ├── main.ts         ← arranque: carga .env, CORS, validación y escucha en el puerto
@@ -112,6 +119,7 @@ actividad01/
 └── frontend/
     ├── index.html          ← formulario + tabla con 3 productos de ejemplo (fase 1)
     ├── css/estilos.css     ← estilos (fase 2)
+    ├── js/config.js        ← a qué backend conectarse (local o Render) (D46)
     └── js/app.js           ← comportamiento; desde la fase 7 habla con el backend con fetch
 ```
 
@@ -165,6 +173,11 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D40 | Configuración en `backend/.env` (`MONGODB_URI`, `PORT`), leído con `process.loadEnvFile()` de Node (sin librería extra) y `MongooseModule.forRootAsync`. Se sube `.env.example`; `.env` va al `.gitignore`. | `CLAUDE.md` 6: configuración separada del código; menos dependencias. | Claude (delegado) |
 | D41 | La colección empieza vacía; los 3 productos de ejemplo se crearon **a través de la API** con `curl`. | Ejercitar el `POST` real contra la base de datos. | Claude (delegado) |
 | D42 | Visor gráfico: **MongoDB Compass 1.53.2** (previsto en `CLAUDE.md` 4.1), instalado en `~/Applications` copiándolo del `.dmg` oficial, sin administrador. No la 1.53.3, publicada ese mismo día. | Petición del usuario: ver los datos con una interfaz visual. | Usuario |
+| D43 | **Despliegue en Render** (plan gratuito): frontend como *Static Site*, backend como *Web Service*. Se acuerda la excepción a `CLAUDE.md` (despliegue estaba fuera de alcance) y se actualiza. | Petición del usuario. | Usuario |
+| D44 | Base de datos de producción: **MongoDB Atlas M0** (gratis), región Frankfurt; acceso de red `0.0.0.0/0` con usuario y contraseña aleatoria. | Render no ofrece MongoDB ni discos persistentes gratis; el plan gratuito no tiene IP fija. | Claude (propuesta) |
+| D45 | **GitHub Actions** (`.github/workflows/ci-cd.yml`): comprobar frontend (`node --check`), backend (`npm ci`, `build`, arranque con un MongoDB 8.0 temporal y prueba de humo 201/200/400/404) y, solo en push a `main` y si todo pasa, llamar a los **Deploy Hooks** de Render (guardados como *Secrets*). Auto-Deploy de Render en **Off**. | El usuario pidió usar GitHub Actions; solo se publica código probado. | Claude (propuesta) |
+| D46 | Configuración separada para la nube: `main.ts` lee `.env` solo si existe y comprueba `MONGODB_URI`; CORS desde `CORS_ORIGINS`; puerto desde `PORT`. Frontend: `js/config.js` elige backend local o de Render según `location.hostname`. | En Render no hay `.env`; misma base de código para local e Internet. | Claude (propuesta) |
+| D47 | Node **24** fijado en `backend/.node-version` (Render y Actions). Build en Render: `npm ci --include=dev && npm run build`; arranque: `npm run start:prod`. | Versión LTS disponible en ambos; la CLI de Nest es dependencia de desarrollo. | Claude (propuesta) |
 
 ---
 
@@ -286,6 +299,21 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - Se mostró al usuario la web en su navegador y MongoDB en una ventana de Terminal con `mongosh`.
 - A petición del usuario, se instaló y abrió **MongoDB Compass** como visor gráfico (D42).
 
+### Sesión 1 (cont.) — Despliegue en Render
+
+- Petición: desplegar en Render (free tier) con GitHub Actions; preparar guía y ficheros.
+- Avisos dados: despliegue fuera de alcance en `CLAUDE.md` (se acuerda y actualiza, D43); Render no tiene MongoDB → Atlas (D44).
+- Ficheros: `ci-cd.yml` (D45), `main.ts` + `.env.example` + `config.js` + `index.html` (D46), `.node-version` (D47),
+  guía `docs/despliegue-render.md`.
+- Verificado en local: YAML válido (Ruby); `npm run build` → `dist/main.js`; sin `.env` ni `MONGODB_URI` → mensaje claro y salida 1;
+  backend compilado arrancado **solo con variables de entorno** (puerto 3100, base `catalogo_ci`) → prueba de humo del workflow OK;
+  CORS desde `CORS_ORIGINS` (origen de Render autorizado, ajeno bloqueado); base de prueba borrada; datos reales intactos (4 productos);
+  prueba del navegador con `config.js` OK.
+- Aviso: el token fine-grained necesita el permiso **Workflows: Read and write** para subir `.github/workflows/`.
+- Atlas: el usuario ya tenía cuenta. Cluster `cluster0.by4xinj.mongodb.net`; comprobado sin credenciales: DNS (3 réplicas) y conexión
+  desde el Mac (saludo `hello` OK). El usuario pegó la contraseña de la BD en la conversación: se le recomendó cambiarla;
+  Claude no la usa ni la guarda.
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -293,6 +321,11 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [ ] Opcional: evitar que el precio se parta en dos líneas en pantallas estrechas.
 - [x] Instalar Git y hacer el primer commit "fase 1" (D18).
 - [x] Conectar con GitHub y hacer el primer `push` (D20).
+- [ ] Despliegue: commit + push de los ficheros (con permiso **Workflows** en el token).
+- [ ] Despliegue (usuario): Atlas, servicios de Render, Deploy Hooks y *Secrets* (guía, pasos 1, 3, 5 y 6).
+- [ ] Despliegue: poner la URL real del backend en `frontend/js/config.js` (paso 4).
+- [ ] Cambiar la contraseña del usuario de Atlas (se compartió en la conversación).
+- [ ] Atlas: confirmar *Network Access* = `0.0.0.0/0` (necesario para Render).
 - [ ] Revocar el token de GitHub cuando deje de usarse (se compartió en la conversación con Claude).
 - [x] Fase 3 (con `localStorage`, D17).
 - [ ] Que el usuario pruebe la aplicación en su navegador (MongoDB + backend + frontend arrancados).

@@ -64,7 +64,7 @@ No corrijas errores en silencio: los errores son parte del aprendizaje.
 
 - **Sistema operativo**: macOS (terminal zsh).
 - **Node.js**: ya instalado (verificar versión en la fase 0).
-- **Trabajo**: 100 % local. Sin despliegue.
+- **Trabajo**: desarrollo en local. **Despliegue en Render** (plan gratuito) con GitHub Actions y MongoDB Atlas, por acuerdo con el usuario (ver D43 en `docs/contexto.md` y `docs/despliegue-render.md`).
 - **Autenticación**: fuera de alcance por ahora.
 - **Control de versiones**: **se usa Git** desde la fase 2 por acuerdo con el usuario (ver D18 en `docs/contexto.md`). Repositorio conectado a GitHub (remoto `origin`, público; ver D20). Haz commits y `push` solo cuando el usuario lo pida.
 
@@ -132,7 +132,7 @@ En el bloque 1, las operaciones se hacen sobre el array del navegador. Desde el 
 - Desde el bloque 1, agrupa en funciones propias el acceso a los datos (por ejemplo, `obtenerProductos`, `crearProducto`). Así, en el bloque 2 solo cambiará el interior de esas funciones, y se verá con claridad qué parte del código se comunica con los datos.
 
 ### 5.4 Fuera de alcance (no añadir sin acuerdo)
-Autenticación, usuarios, despliegue, Docker, frameworks de frontend (React, Vue…), TypeScript en el frontend, `localStorage`, tests automatizados, paginación, subida de imágenes y búsqueda avanzada. Pueden proponerse como mejoras futuras, siempre por separado.
+Autenticación, usuarios, Docker, frameworks de frontend (React, Vue…), TypeScript en el frontend, `localStorage`, tests automatizados, paginación, subida de imágenes y búsqueda avanzada. Pueden proponerse como mejoras futuras, siempre por separado.
 
 ## 6. Convenciones
 

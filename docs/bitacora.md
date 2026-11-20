@@ -345,3 +345,19 @@ Dato seguido: el producto **"Ratón inalámbrico MX"** (Logitech, periférico, 9
 - El mismo dato se **valida tres veces** (HTML, JS, backend): las dos primeras ayudan al usuario; la última protege los datos.
 - Cambiar dónde se guardan los datos (`localStorage` → array → MongoDB) solo obligó a tocar la pieza responsable.
 - Hay **tres servidores** a la vez, cada uno en su puerto: `live-server` (5500), NestJS (3000) y MongoDB (27017).
+
+---
+
+## Despliegue en Render con GitHub Actions (20/11/2026) — en preparación
+
+### Decisiones
+- Frontend → Render *Static Site*; backend → Render *Web Service* (plan gratuito); base de datos → **MongoDB Atlas M0**.
+- **GitHub Actions** prueba cada `push` (frontend, backend con un MongoDB temporal) y solo entonces despliega (Deploy Hooks).
+- La configuración que cambia entre local e Internet sale del código: variables de entorno en el backend, `config.js` en el frontend.
+
+### Lo aprendido (hasta ahora)
+- **CI (integración continua)**: comprobar automáticamente cada cambio. **CD (despliegue continuo)**: publicarlo si las pruebas pasan.
+- Un **workflow** de GitHub Actions es un fichero YAML con trabajos (*jobs*) y pasos (*steps*) que se ejecutan en un ordenador virtual.
+- **Prueba de humo**: arrancar la aplicación y comprobar lo básico (¿responde? ¿crea? ¿valida?).
+- **Secretos**: contraseñas y URLs privadas van en los paneles (Render *Environment*, GitHub *Secrets*), nunca en un repositorio público.
+- En la nube no hay `.env`: el mismo código lee la configuración de **variables de entorno**.

@@ -16,8 +16,9 @@
 // 1. ACCESO A LOS DATOS (petición HTTP al backend con fetch)
 // ---------------------------------------------------------------------
 
-// Dirección de la API del backend (NestJS, fase 5)
-const URL_API = 'http://localhost:3000/productos';
+// Dirección de la API del backend. Viene de js/config.js, que elige la local o la de Render
+// según desde dónde se abra la página (despliegue).
+const URL_API = window.CONFIG.URL_API;
 
 // Hace una petición HTTP al backend y devuelve los datos de la respuesta.
 // Si algo falla, lanza un Error con un mensaje que se puede enseñar al usuario.

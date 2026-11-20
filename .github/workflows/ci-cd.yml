@@ -1,0 +1,153 @@
+# =====================================================================
+# GitHub Actions — Integración y despliegue continuos (CI/CD)
+#
+# Qué hace: cada vez que se sube código a GitHub (push) o se abre una pull request,
+# GitHub arranca un ordenador virtual temporal y ejecuta estos trabajos (jobs):
+#
+#   1. comprobar-frontend → revisa que el JavaScript no tenga errores de sintaxis.
+#   2. comprobar-backend  → instala, compila y ARRANCA el backend con un MongoDB de prueba
+#                           y le hace peticiones reales (prueba de humo).
+#   3. desplegar          → SOLO si los dos anteriores salen bien y es un push a "main":
+#                           avisa a Render para que publique la nueva versión.
+#
+# Si algo falla, el despliegue no se hace: a Internet solo llega código que funciona.
+# Guía completa: docs/despliegue-render.md
+# =====================================================================
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:        # permite lanzarlo a mano desde la pestaña "Actions" de GitHub
+
+jobs:
+  # -------------------------------------------------------------------
+  comprobar-frontend:
+    name: Comprobar frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v5
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: backend/.node-version
+
+      - name: Comprobar la sintaxis del JavaScript
+        run: |
+          for fichero in frontend/js/*.js; do
+            echo "Revisando $fichero"
+            node --check "$fichero"
+          done
+
+  # -------------------------------------------------------------------
+  comprobar-backend:
+    name: Comprobar backend
+    runs-on: ubuntu-latest
+
+    # "services": contenedores que GitHub arranca junto al trabajo.
+    # Aquí, un MongoDB de usar y tirar para probar el backend de verdad.
+    services:
+      mongo:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    defaults:
+      run:
+        working-directory: backend   # todos los comandos se ejecutan dentro de backend/
+
+    env:
+      MONGODB_URI: mongodb://localhost:27017/catalogo_ci
+      PORT: 3000
+
+    steps:
+      - name: Descargar el código del repositorio
+        uses: actions/checkout@v5
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: backend/.node-version
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias (exactamente las de package-lock.json)
+        run: npm ci
+
+      - name: Compilar TypeScript → JavaScript (dist/)
+        run: npm run build
+
+      - name: Arrancar el backend en segundo plano
+        run: |
+          node dist/main.js > servidor.log 2>&1 &
+          # Esperar hasta 30 s a que responda
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null http://localhost:3000/productos && echo "Backend listo" && exit 0
+            sleep 1
+          done
+          echo "El backend no arrancó:"; cat servidor.log; exit 1
+
+      - name: Prueba de humo (peticiones reales a la API)
+        run: |
+          set -e
+          URL=http://localhost:3000/productos
+
+          echo "1) Crear un producto válido → 201"
+          codigo=$(curl -s -o respuesta.json -w "%{http_code}" -X POST $URL \
+            -H "Content-Type: application/json" \
+            -d '{"nombre":"Producto CI","marca":"GitHub","categoria":"accesorio","precio":9.99,"stock":1}')
+          cat respuesta.json; echo
+          test "$codigo" = "201"
+
+          echo "2) Listar → 200 y contiene el producto"
+          codigo=$(curl -s -o lista.json -w "%{http_code}" $URL)
+          test "$codigo" = "200"
+          grep -q "Producto CI" lista.json
+
+          echo "3) Datos inválidos → 400 (la validación funciona)"
+          codigo=$(curl -s -o /dev/null -w "%{http_code}" -X POST $URL \
+            -H "Content-Type: application/json" -d '{"nombre":"X"}')
+          test "$codigo" = "400"
+
+          echo "4) Producto inexistente → 404"
+          codigo=$(curl -s -o /dev/null -w "%{http_code}" $URL/000000000000000000000000)
+          test "$codigo" = "404"
+
+          echo "Prueba de humo superada"
+
+      - name: Mostrar el registro del servidor (si algo ha fallado)
+        if: failure()
+        run: cat servidor.log || true
+
+  # -------------------------------------------------------------------
+  desplegar:
+    name: Desplegar en Render
+    needs: [comprobar-frontend, comprobar-backend]   # solo si los dos anteriores han ido bien
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # Un "Deploy Hook" es una URL secreta de Render: al llamarla, Render publica la última versión.
+      # Las URLs se guardan como SECRETOS del repositorio (no en el código, que es público).
+      - name: Avisar a Render (backend)
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "::warning::Falta el secreto RENDER_DEPLOY_HOOK_BACKEND (ver la guía, paso 6)"; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "Despliegue del backend solicitado"
+
+      - name: Avisar a Render (frontend)
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "::warning::Falta el secreto RENDER_DEPLOY_HOOK_FRONTEND (ver la guía, paso 6)"; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "Despliegue del frontend solicitado"
