@@ -114,3 +114,15 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **CORS (Cross-Origin Resource Sharing)**: regla del navegador que bloquea leer respuestas de otro origen salvo que el servidor lo permita.
 - **`Access-Control-Allow-Origin`**: cabecera con la que el servidor dice qué orígenes pueden leer sus respuestas.
 - **Petición previa (preflight)**: pregunta `OPTIONS` que el navegador hace antes de un `POST`/`PATCH` con JSON a otro origen.
+
+## Fase 8
+
+- **Base de datos**: programa especializado en guardar datos de forma permanente y buscarlos rápido.
+- **MongoDB**: base de datos "de documentos" (NoSQL): guarda objetos parecidos a JSON en vez de tablas.
+- **Colección**: grupo de documentos del mismo tipo (como una tabla en otras bases de datos). Aquí: `productos`.
+- **Documento**: un registro en MongoDB, con forma de objeto JSON (un producto).
+- **`_id` / ObjectId**: identificador único que MongoDB pone a cada documento.
+- **`mongod`**: el servidor de MongoDB (el que guarda los datos).
+- **`mongosh`**: la consola (shell) para hablar con MongoDB escribiendo comandos.
+- **Binario**: programa ya compilado, listo para ejecutar.
+- **SHA-256 (huella)**: "huella dactilar" de un fichero; si cambia un solo byte, la huella cambia.

@@ -240,3 +240,26 @@ Navegador (frontend :5500) ──HTTP/JSON──▶ NestJS (:3000, array en memo
 - **Sobreviven a:** recargar la página, cerrar el navegador, usar otro navegador (todos ven los mismos datos).
 - **Se pierden al:** reiniciar el servidor (o al guardar un cambio en el backend, porque el modo watch lo reinicia).
 - **Siguiente problema a resolver:** guardar los datos en un sitio que sobreviva al servidor → **base de datos** (bloque 3).
+
+---
+
+## Fase 8 — MongoDB (20/11/2026)
+
+### Decisiones
+- Sin Homebrew ni administrador: **binarios oficiales** de MongoDB 8.0.38 y mongosh 2.14.1 en `~/mongodb/bin`.
+- Cada descarga se comprobó con su huella **SHA-256** antes de usarla.
+- `mongod` escucha solo en `127.0.0.1` (este ordenador), puerto 27017. Datos en `~/mongodb/datos`.
+
+### Lo aprendido
+- **MongoDB** es otro servidor más: un programa que escucha en un puerto (27017), igual que el backend (3000) o el frontend (5500).
+- **Base de datos → colección → documento**: `catalogo` → `prueba_manual` → `{ nombre: "Teclado mecánico", ... }`.
+- Un **documento** se parece mucho a un objeto JSON. MongoDB le añade un identificador único `_id` (`ObjectId`).
+- MongoDB crea la base de datos y la colección **al guardar el primer documento**; no hace falta crearlas antes.
+- `mongosh` es la consola para hablar con MongoDB directamente (como `curl` para el backend).
+- Una **huella SHA-256** permite comprobar que un fichero descargado es exactamente el publicado.
+
+### Prueba
+```
+db.prueba_manual.insertOne({ nombre: "Teclado mecánico", marca: "Keychron", ... })
+→ _id: ObjectId('6b003637e9f83a052c0d2ae3')
+```

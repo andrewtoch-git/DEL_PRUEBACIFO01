@@ -26,7 +26,9 @@
 | 2 — Backend | 5. API en memoria | ✅ Completada |
 | 2 — Backend | 6. Validación | ✅ Completada |
 | 2 — Backend | 7. Conexión | ✅ Completada (fetch + CORS) |
-| 3 — Base de datos | 8–10 | ⏳ Pendiente |
+| 3 — Base de datos | 8. MongoDB | ✅ Completada (binarios en `~/mongodb`) |
+| 3 — Base de datos | 9. Persistencia | ⏳ Pendiente |
+| 3 — Base de datos | 10. Repaso | ⏳ Pendiente |
 
 **En curso:** el usuario pidió terminar las fases 4 a 9 (backend, API, validación, conexión, MongoDB y persistencia) y subirlas a GitHub.
 Se avanza fase a fase, con commit y push al cerrar cada una; las decisiones siguen las recomendaciones de Claude (delegadas).
@@ -50,6 +52,7 @@ Se avanza fase a fase, con commit y push al cerrar cada una; las decisiones sigu
 | Git | Se usa desde la fase 2 (D18). Git 2.39.5 (Apple), instalado con las Command Line Tools en `/Library/Developer/CommandLineTools`. |
 | CLI de Nest | `@nestjs/cli` 12.0.15, instalada con `npm install -g` en `~/.npm-global` (carpeta personal, ya en el PATH; no requiere administrador). |
 | Backend | NestJS 12 en `backend/`, puerto **3000**. Proyecto en modo ESM (las importaciones terminan en `.js`). |
+| MongoDB | **8.0.38** (servidor `mongod`) y **mongosh 2.14.1**, binarios oficiales en `~/mongodb/bin` (sin Homebrew ni administrador; no están en el PATH, se usan con la ruta completa). Datos en `~/mongodb/datos`, registro en `~/mongodb/mongod.log`. Escucha solo en `127.0.0.1:27017`. |
 | GitHub | Remoto `origin` → `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (público). Token personal en el llavero de macOS (D20). |
 
 ### Arrancar el frontend
@@ -65,6 +68,13 @@ Desde otra terminal en `actividad01/backend`:
 npm run start:dev
 ```
 Escucha en `http://localhost:3000` y se reinicia solo al guardar cambios. Parar con **Ctrl+C**.
+
+### Arrancar MongoDB
+En otra terminal (cualquier carpeta):
+```
+~/mongodb/bin/mongod --dbpath ~/mongodb/datos --bind_ip 127.0.0.1 --port 27017 --logpath ~/mongodb/mongod.log
+```
+Consola para ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/catalogo`. Parar `mongod` con **Ctrl+C**.
 
 ---
 
@@ -143,6 +153,9 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D32 | En `actualizar`, se copian solo los campos con valor (no `Object.assign`). | Error detectado: con `transform: true` y `target ES2023`, los campos no enviados existen como `undefined` y borraban los datos. | Claude |
 | D33 | Fase 7: la parte 1 de `app.js` usa `fetch` contra `http://localhost:3000/productos` en lugar de `localStorage`. Las funciones de datos pasan a `async` y quien las llama usa `await` (como anticipaba D24). Función común `peticion()` que convierte los errores HTTP y de red en mensajes legibles. Se mantiene la validación del frontend. | `CLAUDE.md` fase 7; separación de la capa de datos. | Claude (delegado) |
 | D34 | CORS: `app.enableCors({ origin: ['http://127.0.0.1:5500', 'http://localhost:5500'] })`. Solo nuestro frontend, no `*`. | Se observó primero el error real en Chrome; autorizar solo lo necesario. | Claude (delegado) |
+| D35 | MongoDB instalado con los **binarios oficiales** (`.tgz` de fastdl.mongodb.org y `.zip` de mongosh en GitHub), verificados con SHA-256 y copiados a `~/mongodb/bin`. Sustituye a la instalación con Homebrew prevista en `CLAUDE.md`. | El equipo no tiene Homebrew ni permisos de administrador. | Claude (delegado) |
+| D36 | Versiones: MongoDB **8.0.38** (rama madura, compatible con Mongoose) y mongosh **2.14.1** (no la publicada el día anterior). | Estabilidad y prudencia con versiones recién publicadas. | Claude (delegado) |
+| D37 | `mongod` escucha solo en `127.0.0.1` (no en la red del aula). No se añade `~/mongodb/bin` al PATH (no se toca `~/.zshrc`). | Seguridad y no modificar la configuración del sistema sin necesidad. | Claude (delegado) |
 
 ---
 
@@ -240,6 +253,13 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - Para las pruebas, `live-server` se reinició montando la carpeta temporal de Claude en `/__prueba__` (no afecta al frontend).
 - **Bloque 2 cerrado.**
 
+**Fase 8 — MongoDB**
+- Mac `arm64`, macOS 15.5. Versiones consultadas en `downloads.mongodb.org/current.json` y en la API de GitHub de mongosh.
+- Descargas verificadas con SHA-256 (ambas OK), instaladas en `~/mongodb/bin` (D35–D37); descargas temporales borradas.
+- `mongod` arrancado en segundo plano; escuchando en `127.0.0.1:27017`.
+- Con `mongosh`: `insertOne` en la colección `prueba_manual` de la base `catalogo` → MongoDB generó el `_id` (`ObjectId`).
+  La base `catalogo` no existía antes: se crea al guardar el primer documento.
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -254,4 +274,6 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [x] Decidir el orden: se sigue el de `CLAUDE.md` (D25).
 - [x] Fase 4 (NestJS mínimo).
 - [ ] Decidir si se actualiza `CLAUDE.md` 5.4 para reflejar la excepción de `localStorage` (de momento solo consta en D17).
-- [ ] Bloque 3: decidir cómo instalar MongoDB sin Homebrew ni permisos de administrador.
+- [x] Bloque 3: instalar MongoDB sin Homebrew ni administrador (D35).
+- [ ] Opcional: añadir `~/mongodb/bin` al PATH para escribir solo `mongod` / `mongosh`.
+- [ ] Opcional: borrar la colección de prueba `prueba_manual` cuando ya no haga falta.

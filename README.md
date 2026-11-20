@@ -25,6 +25,15 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 3. Arrancar: `npm run start:dev` → escucha en `http://localhost:3000` y se reinicia al guardar cambios.
 4. Probar: `curl http://localhost:3000/`.
 
+### Base de datos (bloque 3)
+MongoDB está instalado en `~/mongodb` (binarios oficiales; ver `docs/contexto.md`). En otra terminal:
+```
+~/mongodb/bin/mongod --dbpath ~/mongodb/datos --bind_ip 127.0.0.1 --port 27017 --logpath ~/mongodb/mongod.log
+```
+Ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/catalogo`.
+
+**Orden de arranque:** MongoDB → backend → frontend.
+
 ## Estado de las fases
 
 | Bloque | Fase | Estado |
@@ -37,6 +46,6 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 | 2 — Backend | 5. API en memoria | ✅ Completada |
 | 2 — Backend | 6. Validación | ✅ Completada |
 | 2 — Backend | 7. Conexión | ✅ Completada |
-| 3 — Base de datos | 8. MongoDB | ⏳ Pendiente |
+| 3 — Base de datos | 8. MongoDB | ✅ Completada |
 | 3 — Base de datos | 9. Persistencia | ⏳ Pendiente |
 | 3 — Base de datos | 10. Repaso | ⏳ Pendiente |
