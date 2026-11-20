@@ -21,16 +21,17 @@
 | 1 — Frontend | 0. Entorno mínimo | ✅ Completada |
 | 1 — Frontend | 1. Estructura (HTML) | ✅ Completada |
 | 1 — Frontend | 2. Presentación (CSS) | ✅ Completada (verificada con capturas de Chrome headless) |
-| 1 — Frontend | 3. Comportamiento (JS) | ⏳ Pendiente |
+| 1 — Frontend | 3. Comportamiento (JS) | ✅ Completada (CRUD con `localStorage`, 19 pruebas automáticas + prueba de recarga) |
 | 2 — Backend | 4–7 | ⏳ Pendiente |
 | 3 — Base de datos | 8–10 | ⏳ Pendiente |
 
-**Siguiente paso:** ⏸️ **En pausa por indicación del usuario: no avanzar hasta que lo pida.**
-Cuando se retome: plan de la fase 3 (JavaScript: CRUD con `localStorage` según D17, listado, crear, editar, eliminar, validar).
-Hay cambios en `README.md`, `docs/bitacora.md` y `docs/contexto.md` **sin commit** (cierre de la fase 2 y registro del push): preguntar si se guardan y se suben.
+**Bloque 1 terminado.** Se sigue el orden del profesor (D25): **siguiente paso = fase 4 (backend mínimo con NestJS)**.
+Presentar el plan de la fase 4 y esperar aprobación antes de instalar nada.
 
-**Dónde viven ahora los datos:** escritos a mano dentro de `index.html` (3 productos de ejemplo). No hay datos "vivos" todavía.
-En la fase 3 vivirán en el `localStorage` del navegador (D17): sobreviven a recargar, pero solo existen en ese navegador de ese equipo.
+**Dónde viven ahora los datos:** en el `localStorage` del navegador (D17), bajo la clave `productos`, como texto JSON.
+- Sobreviven a recargar la página y a cerrar el navegador.
+- Se pierden si se borran los datos del sitio en el navegador.
+- Solo existen en **ese navegador de ese equipo**: otro navegador u otro ordenador no los ve.
 
 ---
 
@@ -71,7 +72,7 @@ actividad01/
 └── frontend/
     ├── index.html          ← formulario + tabla con 3 productos de ejemplo (fase 1)
     ├── css/estilos.css     ← estilos (fase 2)
-    └── js/                 ← vacía; app.js se crea en la fase 3
+    └── js/app.js           ← comportamiento: CRUD con localStorage (fase 3)
 ```
 
 ---
@@ -102,6 +103,11 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D18 | **Se usa Git** (repositorio local, sin remotos). Se instala mediante las Command Line Tools de Apple (`xcode-select --install`). Autor de los commits: `andres <andresrodriguezinfo@gmail.com>`, configurado solo para este repositorio. Los commits llevan la línea `Co-Authored-By: Claude`. Primer commit titulado "fase 1", aunque incluye también la fase 2. Se actualiza `CLAUDE.md` (apartados 4 y 5.4), que antes prohibía Git. | Petición del usuario: llevar control de versiones del proyecto. | Usuario |
 | D19 | Se crea `.gitignore` con `.DS_Store`. | Finder crea esos ficheros solo; no son del proyecto. | Usuario |
 | D20 | **Repositorio conectado a GitHub**: `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (remoto `origin`, **público**). Autenticación por **HTTPS + token personal**, guardado en el llavero de macOS (lo guardó Claude a petición del usuario). Se mantiene el email real en los commits (visible públicamente, aceptado por el usuario). Se actualiza `CLAUDE.md` (apartado 4). | Petición del usuario. HTTPS + token elegido frente a SSH. | Usuario |
+| D21 | Fase 3: si el almacén está vacío, se cargan 3 productos de ejemplo. | No empezar con la tabla vacía. | Usuario (aceptó la recomendación) |
+| D22 | Fase 3: confirmar antes de eliminar con `confirm()`. | Lo más sencillo; evita borrados por error. | Usuario (aceptó la recomendación) |
+| D23 | Fase 3: validación doble (HTML + JS, con `trim()`). | No confiar en lo que llega; ejemplo: un nombre de 2 espacios pasa el HTML pero no el JS. | Usuario (aceptó la recomendación) |
+| D24 | Fase 3: `app.js` en 4 partes (datos, validación, interfaz, eventos). Las funciones de datos son **síncronas**; en la fase 7, al usar `fetch`, pasarán a ser asíncronas y quien las llama necesitará `await`. | Simplicidad ahora; la asincronía se aprende en la fase 7. | Claude |
+| D25 | Se mantiene el orden de `CLAUDE.md`: bloque 2 (NestJS) antes que MongoDB (bloque 3). | El navegador nunca habla directamente con MongoDB; sin backend no habría nada que lo usara. | Usuario |
 
 ---
 
@@ -152,6 +158,21 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 
 ---
 
+**Cierre de la fase 2:** commit "Cerrar fase 2" subido a GitHub (el push usó el token del llavero sin pedir nada).
+
+**Fase 3 — Comportamiento (JS + localStorage)**
+- Plan aprobado con D21–D23; el usuario pidió terminar la fase entera de una vez.
+- Creado `frontend/js/app.js` (D24). `index.html`: quitadas las filas escritas a mano (el `<tbody>` queda vacío),
+  añadidos `<script src="js/app.js" defer>` y los `id` `titulo-formulario` y `boton-guardar`.
+  `estilos.css`: estilos `.mensaje`, `.mensaje-exito`, `.mensaje-error`.
+- Verificación: `node --check` (sintaxis) y una página de prueba en Chrome headless que usa la app real:
+  19 comprobaciones correctas (listado, validación, crear, editar, cancelar, eliminar con y sin confirmación,
+  seguridad con `textContent`) y una segunda carga que confirma que los datos **persisten al recargar**.
+- Incidencia en la prueba: Chrome headless se quedaba colgado por el script de recarga que inyecta `live-server`
+  (mantiene una conexión abierta). Se quitó ese script de la página de prueba.
+- **Bloque 1 cerrado.**
+- Commit "Fase 3: CRUD con localStorage" subido a GitHub. El usuario quería ir a MongoDB; se le explicó el orden y eligió seguirlo (D25).
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -160,6 +181,10 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [x] Instalar Git y hacer el primer commit "fase 1" (D18).
 - [x] Conectar con GitHub y hacer el primer `push` (D20).
 - [ ] Revocar el token de GitHub cuando deje de usarse (se compartió en la conversación con Claude).
-- [ ] Plan de la fase 3 (con `localStorage`, D17).
+- [x] Fase 3 (con `localStorage`, D17).
+- [ ] Que el usuario pruebe la fase 3 en su navegador.
+- [x] Commit y push de la fase 3.
+- [x] Decidir el orden: se sigue el de `CLAUDE.md` (D25).
+- [ ] Plan de la fase 4 (NestJS).
 - [ ] Decidir si se actualiza `CLAUDE.md` 5.4 para reflejar la excepción de `localStorage` (de momento solo consta en D17).
 - [ ] Bloque 3: decidir cómo instalar MongoDB sin Homebrew ni permisos de administrador.

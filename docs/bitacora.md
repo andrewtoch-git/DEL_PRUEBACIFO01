@@ -78,3 +78,43 @@ Decisiones tomadas y lo aprendido en cada fase.
 - Curiosidad: Chrome *headless* no baja de 500 px de ancho; una captura a 400 px sale recortada y parece un fallo que no existe.
   Moraleja: comprobar la herramienta de verificación antes de culpar al código.
 - Mejora opcional detectada (no aplicada): en pantallas estrechas el precio se parte en dos líneas ("1199,00 / €").
+
+---
+
+## Fase 3 — Comportamiento con JavaScript (20/11/2026)
+
+### Decisiones
+- Los datos se guardan en **`localStorage`** (excepción acordada a `CLAUDE.md`).
+- Si el almacén está vacío, se cargan 3 productos de ejemplo.
+- Antes de eliminar se pide confirmación con `confirm()`.
+- Validación doble: la del HTML y otra en JavaScript.
+- `app.js` se divide en 4 partes: **datos**, **validación**, **interfaz** y **eventos**. Solo la parte de datos toca `localStorage`.
+- El `<tbody>` del HTML queda vacío: las filas las crea JavaScript.
+
+### Lo aprendido
+- **DOM**: JavaScript busca elementos (`getElementById`), los crea (`createElement`) y los cambia (`textContent`).
+- **Eventos**: `addEventListener('submit' | 'click' | 'reset', ...)` = "cuando pase esto, haz aquello".
+- `preventDefault()` evita que el formulario recargue la página (su comportamiento por defecto).
+- `localStorage` solo guarda **texto**: `JSON.stringify` convierte la lista en texto y `JSON.parse` la recupera.
+- `textContent` en vez de `innerHTML`: lo que escribe el usuario se muestra como texto, nunca se ejecuta como HTML.
+- Del formulario todo llega como **texto**; precio y stock se convierten a número con `Number()` después de validar.
+- La validación HTML se puede saltar; la de JavaScript es una segunda barrera (y en el bloque 2 habrá una tercera, en el servidor).
+
+### Verificación
+- 19 comprobaciones automáticas en Chrome headless sobre la app real, todas correctas, y una segunda carga
+  que confirma que los datos persisten al recargar.
+- Incidencia: la prueba se colgaba por el script de recarga automática de `live-server`, que mantiene una conexión abierta.
+
+---
+
+## Cierre del bloque 1: ¿dónde viven ahora los datos y cuándo se pierden?
+
+```
+Navegador (HTML + CSS + JS) ──▶ localStorage (en ese mismo navegador)
+```
+
+- **Dónde:** en el `localStorage` del navegador, clave `productos`, como texto JSON.
+- **Sobreviven a:** recargar la página, cerrar el navegador, apagar el ordenador.
+- **Se pierden si:** se borran los datos del sitio, se usa otro navegador u otro ordenador.
+- **Limitación clave:** cada navegador tiene su propia copia; nadie más ve tus productos.
+  Por eso hace falta un **servidor** (bloque 2): un sitio central al que todos los navegadores pidan los mismos datos.

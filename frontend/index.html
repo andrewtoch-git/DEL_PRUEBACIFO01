@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- Fase 1: solo ESTRUCTURA. Los botones aún no hacen nada (eso llega en la fase 3 con JavaScript). -->
+<!-- Estructura de la página (fase 1). El estilo está en css/estilos.css (fase 2)
+     y el comportamiento en js/app.js (fase 3). -->
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -8,6 +9,9 @@
   <title>Catálogo tecnológico</title>
   <!-- Enlace a la hoja de estilos (fase 2): el HTML dice QUÉ hay; el CSS, CÓMO se ve -->
   <link rel="stylesheet" href="css/estilos.css">
+  <!-- Comportamiento (fase 3). "defer" hace que el script espere a que todo el HTML esté cargado,
+       así puede encontrar el formulario y la tabla. -->
+  <script src="js/app.js" defer></script>
 </head>
 <body>
 
@@ -25,7 +29,8 @@
 
     <!-- Sección del formulario: sirve para crear y (en la fase 3) también para editar -->
     <section>
-      <h2>Nuevo producto</h2>
+      <!-- El id permite que JavaScript cambie el título a "Editar producto" -->
+      <h2 id="titulo-formulario">Nuevo producto</h2>
 
       <!-- Los atributos required, minlength, maxlength y min son validación del propio HTML:
            el navegador impide enviar el formulario si no se cumplen. -->
@@ -76,7 +81,7 @@
 
         <p>
           <!-- type="submit" envía el formulario; type="reset" vacía los campos -->
-          <button type="submit">Guardar</button>
+          <button type="submit" id="boton-guardar">Guardar</button>
           <button type="reset">Cancelar</button>
         </p>
 
@@ -103,45 +108,9 @@
           </tr>
         </thead>
 
-        <!-- <tbody>: los datos. Ahora están escritos a mano; en la fase 3 los generará JavaScript desde un array. -->
-        <tbody id="lista-productos">
-          <tr>
-            <td>MacBook Air 13"</td>
-            <td>Apple</td>
-            <td>Portátil</td>
-            <td>1199,00 €</td>
-            <td>5</td>
-            <td>Portátil ligero con chip M3.</td>
-            <td>
-              <button type="button">Editar</button>
-              <button type="button">Eliminar</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Galaxy S24</td>
-            <td>Samsung</td>
-            <td>Smartphone</td>
-            <td>899,99 €</td>
-            <td>12</td>
-            <td>Pantalla de 6,2 pulgadas.</td>
-            <td>
-              <button type="button">Editar</button>
-              <button type="button">Eliminar</button>
-            </td>
-          </tr>
-          <tr>
-            <td>WH-1000XM5</td>
-            <td>Sony</td>
-            <td>Audio</td>
-            <td>349,00 €</td>
-            <td>0</td>
-            <td></td>
-            <td>
-              <button type="button">Editar</button>
-              <button type="button">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
+        <!-- <tbody>: los datos. Está VACÍO a propósito: las filas las genera JavaScript (js/app.js)
+             a partir de los productos guardados en localStorage. -->
+        <tbody id="lista-productos"></tbody>
       </table>
     </section>
 

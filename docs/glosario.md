@@ -46,3 +46,21 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **Variable CSS**: valor con nombre (`--color-principal`) que se define una vez y se reutiliza.
 - **Pseudoclase**: estado de un elemento, como `:hover` (ratón encima) o `:focus` (campo activo).
 - **Media query**: reglas que solo se aplican en ciertas condiciones, por ejemplo pantallas estrechas.
+
+## Fase 3
+
+- **JavaScript**: lenguaje que da **comportamiento** a la página: reacciona a lo que hace el usuario y cambia el contenido.
+- **Variable / constante**: nombre que guarda un valor. `let` puede cambiar; `const` no.
+- **Función**: bloque de código con nombre que hace una tarea y se puede llamar cuando haga falta (`crearProducto(...)`).
+- **Array (lista)**: colección ordenada de valores, como `[producto1, producto2]`.
+- **Objeto**: conjunto de pares nombre-valor, como `{ nombre: 'Galaxy S24', precio: 899.99 }`.
+- **Evento**: algo que ocurre en la página (un clic, enviar un formulario) y al que JavaScript puede reaccionar.
+- **`addEventListener`**: "cuando ocurra este evento en este elemento, ejecuta esta función".
+- **`preventDefault()`**: impide la acción por defecto del navegador (por ejemplo, recargar al enviar un formulario).
+- **`localStorage`**: pequeño almacén del navegador que guarda texto de forma permanente, solo para esa web y ese navegador.
+- **JSON**: formato de texto para representar datos (listas y objetos). `JSON.stringify` (objeto → texto) y `JSON.parse` (texto → objeto).
+- **`textContent` / `innerHTML`**: el primero pone texto tal cual; el segundo lo interpreta como HTML (peligroso con datos del usuario).
+- **`trim()`**: quita los espacios del principio y del final de un texto.
+- **Expresión regular**: patrón para comprobar la forma de un texto, como `/^\d+$/` ("solo dígitos").
+- **`defer`**: atributo de `<script>` que hace esperar al script hasta que el HTML esté cargado.
+- **CRUD**: *Create, Read, Update, Delete*: crear, leer, actualizar y eliminar. Las 4 operaciones básicas sobre datos.
