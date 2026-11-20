@@ -22,11 +22,14 @@
 | 1 — Frontend | 1. Estructura (HTML) | ✅ Completada |
 | 1 — Frontend | 2. Presentación (CSS) | ✅ Completada (verificada con capturas de Chrome headless) |
 | 1 — Frontend | 3. Comportamiento (JS) | ✅ Completada (CRUD con `localStorage`, 19 pruebas automáticas + prueba de recarga) |
-| 2 — Backend | 4–7 | ⏳ Pendiente |
+| 2 — Backend | 4. Backend mínimo | ✅ Completada |
+| 2 — Backend | 5. API en memoria | ⏳ Pendiente |
+| 2 — Backend | 6. Validación | ⏳ Pendiente |
+| 2 — Backend | 7. Conexión | ⏳ Pendiente |
 | 3 — Base de datos | 8–10 | ⏳ Pendiente |
 
-**Bloque 1 terminado.** Se sigue el orden del profesor (D25): **siguiente paso = fase 4 (backend mínimo con NestJS)**.
-Presentar el plan de la fase 4 y esperar aprobación antes de instalar nada.
+**En curso:** el usuario pidió terminar las fases 4 a 9 (backend, API, validación, conexión, MongoDB y persistencia) y subirlas a GitHub.
+Se avanza fase a fase, con commit y push al cerrar cada una; las decisiones siguen las recomendaciones de Claude (delegadas).
 
 **Dónde viven ahora los datos:** en el `localStorage` del navegador (D17), bajo la clave `productos`, como texto JSON.
 - Sobreviven a recargar la página y a cerrar el navegador.
@@ -46,6 +49,8 @@ Presentar el plan de la fase 4 y esperar aprobación antes de instalar nada.
 | Editor | **VS Code**, instalado en `~/Applications` (carpeta personal). Se usa **solo como editor**, no para servir la página. |
 | No disponible | Homebrew, Command Line Tools de Apple (por tanto, tampoco `python3`). |
 | Git | Se usa desde la fase 2 (D18). Git 2.39.5 (Apple), instalado con las Command Line Tools en `/Library/Developer/CommandLineTools`. |
+| CLI de Nest | `@nestjs/cli` 12.0.15, instalada con `npm install -g` en `~/.npm-global` (carpeta personal, ya en el PATH; no requiere administrador). |
+| Backend | NestJS 12 en `backend/`, puerto **3000**. Proyecto en modo ESM (las importaciones terminan en `.js`). |
 | GitHub | Remoto `origin` → `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (público). Token personal en el llavero de macOS (D20). |
 
 ### Arrancar el frontend
@@ -55,6 +60,13 @@ npx live-server --host=127.0.0.1 --port=5500 frontend
 ```
 Abrir `http://127.0.0.1:5500`. Parar con **Ctrl+C**. El servidor solo funciona mientras esa terminal está abierta.
 
+### Arrancar el backend
+Desde otra terminal en `actividad01/backend`:
+```
+npm run start:dev
+```
+Escucha en `http://localhost:3000` y se reinicia solo al guardar cambios. Parar con **Ctrl+C**.
+
 ---
 
 ## 3. Estructura de ficheros actual
@@ -62,13 +74,20 @@ Abrir `http://127.0.0.1:5500`. Parar con **Ctrl+C**. El servidor solo funciona m
 ```
 actividad01/
 ├── .git/                   ← repositorio de Git (oculto; guarda la historia)
-├── .gitignore              ← ficheros que Git ignora (.DS_Store)
+├── .gitignore              ← ficheros que Git ignora (.DS_Store, node_modules/, dist/)
 ├── CLAUDE.md               ← instrucciones del profesor (adaptado: D16, D18)
 ├── README.md               ← arranque y estado de las fases
 ├── docs/
 │   ├── contexto.md         ← ESTE fichero
 │   ├── bitacora.md
 │   └── glosario.md
+├── backend/                ← NestJS (bloque 2), generado con la CLI
+│   ├── package.json        ← dependencias y scripts (start:dev...)
+│   └── src/
+│       ├── main.ts         ← arranque: crea la app y escucha en el puerto 3000
+│       ├── app.module.ts   ← módulo raíz
+│       ├── app.controller.ts ← GET / → "¡Hola desde el backend!"
+│       └── app.service.ts
 └── frontend/
     ├── index.html          ← formulario + tabla con 3 productos de ejemplo (fase 1)
     ├── css/estilos.css     ← estilos (fase 2)
@@ -108,6 +127,10 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D23 | Fase 3: validación doble (HTML + JS, con `trim()`). | No confiar en lo que llega; ejemplo: un nombre de 2 espacios pasa el HTML pero no el JS. | Usuario (aceptó la recomendación) |
 | D24 | Fase 3: `app.js` en 4 partes (datos, validación, interfaz, eventos). Las funciones de datos son **síncronas**; en la fase 7, al usar `fetch`, pasarán a ser asíncronas y quien las llama necesitará `await`. | Simplicidad ahora; la asincronía se aprende en la fase 7. | Claude |
 | D25 | Se mantiene el orden de `CLAUDE.md`: bloque 2 (NestJS) antes que MongoDB (bloque 3). | El navegador nunca habla directamente con MongoDB; sin backend no habría nada que lo usara. | Usuario |
+| D26 | CLI de Nest instalada de forma global (`npm install -g`), que en este equipo va a `~/.npm-global`. Proyecto generado con `nest new backend --package-manager npm --skip-git`. | Lo previsto en `CLAUDE.md`; `--skip-git` evita un repositorio Git dentro del nuestro. | Claude (delegado) |
+| D27 | Limpieza de lo que añadió la CLI 12 sin pedirlo: se desinstalan `@nestjs/observe` (monitorización externa) y `@nestjs/mau` (despliegue), se quita el script `deploy` y se borran `backend/CLAUDE.md`, `AGENTS.md`, `.claude/skills/` y `.agents/skills/`. | Piezas no previstas; los ficheros para agentes de IA contenían instrucciones que chocaban con las del profesor. | Usuario (aprobó al pedir terminar las fases) |
+| D28 | Se añaden `node_modules/` y `dist/` al `.gitignore` de la raíz. | Con `--skip-git` la CLI no creó `.gitignore`; sin esto se subirían cientos de MB de librerías. | Claude |
+| D29 | Los tests generados por Nest se conservan sin usar (solo se actualizó el texto esperado del saludo). | Tests fuera de alcance; borrarlos obligaría a tocar más configuración. | Claude (delegado) |
 
 ---
 
@@ -173,6 +196,16 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - **Bloque 1 cerrado.**
 - Commit "Fase 3: CRUD con localStorage" subido a GitHub. El usuario quería ir a MongoDB; se le explicó el orden y eligió seguirlo (D25).
 
+**Fase 4 — Backend mínimo (NestJS)**
+- Comprobado: npm instala lo "global" en `~/.npm-global` (sin administrador); puerto 3000 libre.
+- `npm install -g @nestjs/cli` → versión 12.0.15. `nest new backend --package-manager npm --skip-git`.
+- **Sorpresa:** la CLI 12 añadió monitorización (`@nestjs/observe`), herramientas de despliegue (`@nestjs/mau`) y ficheros
+  de instrucciones para agentes de IA, e imprimió un mensaje dirigido a "agentes" pidiendo conectar la monitorización.
+  Claude no siguió esas instrucciones (no vienen del usuario) y propuso limpiarlo todo (D27). No creó `.gitignore` (D28).
+- `main.ts`, `app.module.ts`, `app.controller.ts`, `app.service.ts` reescritos limpios y comentados.
+- Experimento: el saludo pasa de "Hello World!" a "¡Hola desde el backend!".
+- Verificado con `curl -i http://localhost:3000/` → `HTTP/1.1 200 OK`, `¡Hola desde el backend!`.
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -185,6 +218,6 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [ ] Que el usuario pruebe la fase 3 en su navegador.
 - [x] Commit y push de la fase 3.
 - [x] Decidir el orden: se sigue el de `CLAUDE.md` (D25).
-- [ ] Plan de la fase 4 (NestJS).
+- [x] Fase 4 (NestJS mínimo).
 - [ ] Decidir si se actualiza `CLAUDE.md` 5.4 para reflejar la excepción de `localStorage` (de momento solo consta en D17).
 - [ ] Bloque 3: decidir cómo instalar MongoDB sin Homebrew ni permisos de administrador.

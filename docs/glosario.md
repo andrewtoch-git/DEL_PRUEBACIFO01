@@ -64,3 +64,21 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **Expresión regular**: patrón para comprobar la forma de un texto, como `/^\d+$/` ("solo dígitos").
 - **`defer`**: atributo de `<script>` que hace esperar al script hasta que el HTML esté cargado.
 - **CRUD**: *Create, Read, Update, Delete*: crear, leer, actualizar y eliminar. Las 4 operaciones básicas sobre datos.
+
+## Fase 4
+
+- **Backend**: programa que se ejecuta en un servidor, recibe peticiones HTTP y devuelve datos.
+- **Framework**: esqueleto de aplicación con reglas y piezas ya hechas; tú rellenas los huecos (NestJS).
+- **NestJS**: framework para hacer backends con Node.js y TypeScript.
+- **CLI**: programa de línea de comandos (aquí, `nest`) que genera y gestiona el proyecto.
+- **TypeScript**: JavaScript con **tipos** (decir que algo es `string`, `number`...), que avisa de errores antes de ejecutar.
+- **Compilar**: traducir TypeScript a JavaScript (se guarda en `dist/`), que es lo que Node ejecuta.
+- **Dependencia**: librería de otros que usa nuestro proyecto. Se listan en `package.json` y se descargan en `node_modules/`.
+- **Módulo (NestJS)**: agrupa controladores y servicios relacionados.
+- **Controlador**: clase que recibe las peticiones de unas rutas y devuelve la respuesta.
+- **Servicio**: clase con la lógica; el controlador le delega el trabajo.
+- **Decorador**: etiqueta con `@` (`@Get()`, `@Controller()`) que da información a NestJS sobre una clase o función.
+- **Inyección de dependencias**: NestJS crea los objetos y se los pasa a quien los necesita (por el `constructor`).
+- **`async` / `await`**: forma de esperar a que termine algo que lleva tiempo sin bloquear el programa.
+- **Cabeceras HTTP**: información que acompaña a una petición o respuesta (tipo de contenido, fecha...). Se ven con `curl -i`.
+- **Modo watch**: el servidor vigila los ficheros y se reinicia solo al guardarlos.

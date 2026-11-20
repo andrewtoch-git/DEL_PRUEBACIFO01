@@ -118,3 +118,28 @@ Navegador (HTML + CSS + JS) ──▶ localStorage (en ese mismo navegador)
 - **Se pierden si:** se borran los datos del sitio, se usa otro navegador u otro ordenador.
 - **Limitación clave:** cada navegador tiene su propia copia; nadie más ve tus productos.
   Por eso hace falta un **servidor** (bloque 2): un sitio central al que todos los navegadores pidan los mismos datos.
+
+---
+
+## Fase 4 — Backend mínimo con NestJS (20/11/2026)
+
+### Decisiones
+- CLI de Nest instalada con `npm install -g` (en este equipo va a `~/.npm-global`, sin administrador).
+- Proyecto generado con `nest new backend --package-manager npm --skip-git`.
+- Limpieza de lo que la CLI añadió sin pedirlo: monitorización externa, herramientas de despliegue y ficheros para agentes de IA.
+- `node_modules/` y `dist/` en `.gitignore`.
+
+### Lo aprendido
+- Un **backend** no muestra páginas: escucha peticiones HTTP en un puerto y **ejecuta código** para decidir la respuesta.
+- Recorrido de una petición `GET /`:
+  `main.ts` (arranca y escucha en 3000) → `AppModule` (declara las piezas) → `AppController` (`@Get()` atiende la ruta)
+  → `AppService` (hace el trabajo) → la respuesta vuelve por el mismo camino.
+- **Controlador** = recepcionista (recibe y responde); **servicio** = quien hace el trabajo.
+- **Decoradores** (`@Module`, `@Controller`, `@Get`, `@Injectable`): etiquetas que dan información a NestJS.
+- **Inyección de dependencias**: el controlador no crea el servicio; NestJS se lo entrega en el `constructor`.
+- Los nombres `main.ts`, `app.module.ts`, `constructor`... no se traducen: los impone el framework o el lenguaje.
+- Una herramienta puede hacer más de lo que pides: hay que **revisar lo que genera** antes de darlo por bueno.
+
+### Verificación
+- `curl -i http://localhost:3000/` → `HTTP/1.1 200 OK` y `¡Hola desde el backend!`.
+- Al cambiar el texto en `app.service.ts`, el servidor (modo `--watch`) se reinicia solo y responde el texto nuevo.

@@ -19,6 +19,12 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 3. El navegador abre `http://127.0.0.1:5500`. Al guardar un fichero, la página se recarga sola.
 4. Para parar el servidor: **Ctrl+C** en esa terminal.
 
+### Backend (bloque 2)
+1. Abrir **otra** terminal en `actividad01/backend`.
+2. La primera vez (o tras descargar el proyecto): `npm install` (descarga las librerías en `node_modules/`).
+3. Arrancar: `npm run start:dev` → escucha en `http://localhost:3000` y se reinicia al guardar cambios.
+4. Probar: `curl http://localhost:3000/`.
+
 ## Estado de las fases
 
 | Bloque | Fase | Estado |
@@ -27,7 +33,7 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 | 1 — Frontend | 1. Estructura | ✅ Completada |
 | 1 — Frontend | 2. Presentación | ✅ Completada |
 | 1 — Frontend | 3. Comportamiento | ✅ Completada (CRUD con `localStorage`) |
-| 2 — Backend | 4. Backend mínimo | ⏳ Pendiente |
+| 2 — Backend | 4. Backend mínimo | ✅ Completada |
 | 2 — Backend | 5. API en memoria | ⏳ Pendiente |
 | 2 — Backend | 6. Validación | ⏳ Pendiente |
 | 2 — Backend | 7. Conexión | ⏳ Pendiente |

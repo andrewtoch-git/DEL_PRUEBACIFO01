@@ -2,3 +2,11 @@
 
 # macOS: Finder crea .DS_Store en cada carpeta para recordar cómo se ve. No es parte del proyecto.
 .DS_Store
+
+# Backend (bloque 2):
+# node_modules = librerías descargadas por npm (se recuperan con "npm install"; no son código nuestro)
+node_modules/
+# dist = código JavaScript generado al compilar el TypeScript
+dist/
+# Caché de compilación de TypeScript (se regenera sola)
+*.tsbuildinfo
