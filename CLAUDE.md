@@ -66,7 +66,7 @@ No corrijas errores en silencio: los errores son parte del aprendizaje.
 - **Node.js**: ya instalado (verificar versión en la fase 0).
 - **Trabajo**: 100 % local. Sin despliegue.
 - **Autenticación**: fuera de alcance por ahora.
-- **Control de versiones**: **se usa Git** desde la fase 2 por acuerdo con el usuario (ver D18 en `docs/contexto.md`). Repositorio solo local (sin GitHub ni remotos). Haz commits solo cuando el usuario lo pida.
+- **Control de versiones**: **se usa Git** desde la fase 2 por acuerdo con el usuario (ver D18 en `docs/contexto.md`). Repositorio conectado a GitHub (remoto `origin`, público; ver D20). Haz commits y `push` solo cuando el usuario lo pida.
 
 ### 4.1 Stack
 | Pieza | Tecnología | Bloque | Notas |

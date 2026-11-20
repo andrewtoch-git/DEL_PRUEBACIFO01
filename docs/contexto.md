@@ -44,6 +44,7 @@ En la fase 3 vivirán en el `localStorage` del navegador (D17): sobreviven a rec
 | Editor | **VS Code**, instalado en `~/Applications` (carpeta personal). Se usa **solo como editor**, no para servir la página. |
 | No disponible | Homebrew, Command Line Tools de Apple (por tanto, tampoco `python3`). |
 | Git | Se usa desde la fase 2 (D18). Git 2.39.5 (Apple), instalado con las Command Line Tools en `/Library/Developer/CommandLineTools`. |
+| GitHub | Remoto `origin` → `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (público). Token personal en el llavero de macOS (D20). |
 
 ### Arrancar el frontend
 Desde una terminal en `actividad01`:
@@ -99,6 +100,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D17 | **El CRUD de la fase 3 usa `localStorage`** (opción A: directamente, sin pasar antes por un array en memoria). Se acuerda la excepción a `CLAUDE.md` 5.4, que lo ponía fuera de alcance. | Decisión del usuario. Consecuencia aceptada: en el bloque 1 los datos **no** se pierden al recargar; el motivo del backend pasa a ser compartir los datos entre navegadores/equipos. | Usuario |
 | D18 | **Se usa Git** (repositorio local, sin remotos). Se instala mediante las Command Line Tools de Apple (`xcode-select --install`). Autor de los commits: `andres <andresrodriguezinfo@gmail.com>`, configurado solo para este repositorio. Los commits llevan la línea `Co-Authored-By: Claude`. Primer commit titulado "fase 1", aunque incluye también la fase 2. Se actualiza `CLAUDE.md` (apartados 4 y 5.4), que antes prohibía Git. | Petición del usuario: llevar control de versiones del proyecto. | Usuario |
 | D19 | Se crea `.gitignore` con `.DS_Store`. | Finder crea esos ficheros solo; no son del proyecto. | Usuario |
+| D20 | **Repositorio conectado a GitHub**: `https://github.com/andrewtoch-git/DEL_PRUEBACIFO01.git` (remoto `origin`, **público**). Autenticación por **HTTPS + token personal**, guardado en el llavero de macOS; el primer `push` lo hace el usuario en la app Terminal. Se mantiene el email real en los commits (visible públicamente, aceptado por el usuario). Se actualiza `CLAUDE.md` (apartado 4). | Petición del usuario. HTTPS + token elegido frente a SSH. | Usuario |
 
 ---
 
@@ -147,6 +149,7 @@ Los `.DS_Store` quedaron fuera; después se creó `.gitignore` para ignorarlos (
 - [ ] Revisar en el navegador el estilo de la fase 2 y pedir cambios si hace falta.
 - [ ] Cerrar fase 2 (bitácora, glosario, README).
 - [x] Instalar Git y hacer el primer commit "fase 1" (D18).
+- [ ] Conectar con GitHub y hacer el primer `push` (D20): crear token → `push` desde Terminal → verificar en la web.
 - [ ] Plan de la fase 3 (con `localStorage`, D17).
 - [ ] Decidir si se actualiza `CLAUDE.md` 5.4 para reflejar la excepción de `localStorage` (de momento solo consta en D17).
 - [ ] Bloque 3: decidir cómo instalar MongoDB sin Homebrew ni permisos de administrador.
