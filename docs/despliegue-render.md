@@ -13,8 +13,8 @@ En local teníamos tres servidores en tu Mac. En Internet serán tres servicios 
                  ┌──────────────── GitHub ────────────────┐
   git push  ───▶ │ repositorio  ──▶  GitHub Actions (CI)  │
                  └───────────────────────┬────────────────┘
-                                         │ si todo va bien: "Deploy Hook"
-                                         ▼
+                                         │ si todo va bien, Render despliega
+                                         ▼  (render.yaml: autoDeployTrigger: checksPass)
  Navegador ──▶ Render Static Site ──▶ Render Web Service ──▶ MongoDB Atlas
  (cualquiera)   frontend/ (HTML,CSS,JS)   backend/ (NestJS)    (base de datos M0)
 ```
@@ -41,7 +41,8 @@ un MongoDB dentro de Render perdería los datos en cada reinicio. Atlas es el se
 
 | Fichero | Para qué |
 |---|---|
-| `.github/workflows/ci-cd.yml` | **GitHub Actions**: en cada `git push` comprueba el frontend, compila y prueba el backend con un MongoDB temporal y, si todo va bien, avisa a Render para desplegar. |
+| `render.yaml` | **Blueprint** de Render: describe los dos servicios (backend y frontend) con toda su configuración. Render los crea solos. |
+| `.github/workflows/ci-cd.yml` | **GitHub Actions**: en cada `git push` comprueba el frontend y compila y prueba el backend con un MongoDB temporal. Render **espera a que pase** antes de desplegar. |
 | `backend/.node-version` | Versión de Node (24) que usarán Render y GitHub Actions. |
 | `backend/src/main.ts` | Lee el `.env` **solo si existe** (en Render no hay `.env`: las variables se ponen en su panel) y toma los orígenes de CORS de la variable `CORS_ORIGINS`. |
 | `backend/.env.example` | Documenta la nueva variable `CORS_ORIGINS`. |
@@ -111,12 +112,35 @@ y el frontend local sigue funcionando.
 Después, en GitHub → pestaña **Actions** verás el workflow **CI/CD** ejecutándose:
 - `Comprobar frontend` ✅
 - `Comprobar backend` ✅ (arranca un MongoDB temporal y prueba la API de verdad)
-- `Desplegar en Render` ✅ con un aviso amarillo: *"Falta el secreto RENDER_DEPLOY_HOOK_..."*.
-  Es normal: aún no hemos creado los servicios de Render.
+(El despliegue lo hace Render al ver los dos trabajos en verde, desde el paso 3.)
 
 ---
 
-## Paso 3 — Backend en Render (Web Service)
+## Paso 3 — Crear todo en Render con el Blueprint ⚡ (camino rápido)
+
+1. En Render: **New +** → **Blueprint**.
+2. Conecta GitHub si te lo pide y elige el repositorio **`DEL_PRUEBACIFO01`**, rama `main`.
+3. Render lee `render.yaml` y muestra lo que va a crear: **`catalogo-backend`** (Web Service, Free) y
+   **`catalogo-frontend`** (Static Site). Ponle un nombre al Blueprint (por ejemplo `catalogo`).
+4. Te pedirá el valor de **`MONGODB_URI`** (es la única variable marcada como secreta). Pega la cadena de Atlas
+   **con tu contraseña** en lugar de `<db_password>`:
+   ```
+   mongodb+srv://USUARIO:CONTRASEÑA@cluster0.xxxxx.mongodb.net/catalogo?retryWrites=true&w=majority&appName=Cluster0
+   ```
+5. **Apply** (o *Deploy Blueprint*). Render instala, compila y arranca. En el backend → *Logs* debe aparecer
+   `Nest application successfully started`.
+6. Mira las **URLs** de los dos servicios (arriba en cada uno). Si son exactamente
+   `https://catalogo-backend.onrender.com` y `https://catalogo-frontend.onrender.com`, **no hay nada más que configurar**.
+   Si Render les añadió letras (porque el nombre estaba cogido), pasa a Claude las dos URLs: hay que ajustar
+   `frontend/js/config.js` (paso 4) y la variable `CORS_ORIGINS` del backend (*Environment*).
+7. Prueba: `curl https://catalogo-backend.onrender.com/productos` → `[]`.
+
+A partir de aquí, **cada push a `main` se despliega solo** cuando GitHub Actions termina en verde.
+No hacen falta Deploy Hooks ni *Secrets* (los pasos 3-bis, 5 y 6 son solo para quien prefiera crearlo a mano).
+
+---
+
+## Paso 3-bis — (Alternativa manual) Backend en Render (Web Service)
 
 1. En Render: **New +** → **Web Service** → *Build and deploy from a Git repository*.
 2. Conecta GitHub (la primera vez Render pide instalar su aplicación en GitHub) y elige el repositorio `DEL_PRUEBACIFO01`.
@@ -169,7 +193,7 @@ Después: commit + push (Claude puede hacerlo si le pasáis la URL; no es secret
 
 ---
 
-## Paso 5 — Frontend en Render (Static Site)
+## Paso 5 — (Alternativa manual) Frontend en Render (Static Site)
 
 1. **New +** → **Static Site** → mismo repositorio.
 2. Rellena:
@@ -189,7 +213,13 @@ Después: commit + push (Claude puede hacerlo si le pasáis la URL; no es secret
 
 ---
 
-## Paso 6 — Conectar GitHub Actions con Render (Deploy Hooks)
+## Paso 6 — (Solo en el camino manual) Esperar a GitHub Actions antes de desplegar
+
+Con el Blueprint ya está hecho (`autoDeployTrigger: checksPass`). En el camino manual:
+en cada servicio → *Settings* → **Auto-Deploy** → **After CI Checks Pass**.
+
+<details><summary>Alternativa antigua: Deploy Hooks (no necesaria)</summary>
+
 
 Un **Deploy Hook** es una URL secreta: quien la llama hace que Render publique la última versión del repositorio.
 
@@ -203,15 +233,17 @@ Un **Deploy Hook** es una URL secreta: quien la llama hace que Render publique l
    | `RENDER_DEPLOY_HOOK_FRONTEND` | Deploy Hook del frontend |
 
    Los *Secrets* están cifrados: no se ven en el código ni en los registros, ni siquiera siendo público el repositorio.
+   (Requiere volver a añadir al workflow un trabajo que llame a esas URLs.)
+
+</details>
 
 ---
 
 ## Paso 7 — Probar el ciclo completo
 
 1. Haz cualquier cambio pequeño (por ejemplo, un texto) → commit → push.
-2. GitHub → **Actions**: los tres trabajos en verde; en `Desplegar en Render` debe decir
-   *"Despliegue del backend solicitado"* y *"Despliegue del frontend solicitado"*.
-3. Render → cada servicio → *Events*: un despliegue nuevo *"Deploy triggered via Deploy Hook"*.
+2. GitHub → **Actions**: los dos trabajos en verde.
+3. Render → cada servicio → *Events*: aparece un despliegue nuevo **después** de que Actions termine.
 4. Abre `https://catalogo-frontend.onrender.com`:
    - La primera vez puede tardar (backend dormido). La lista estará **vacía**: es la base de datos de Atlas.
    - Crea un producto desde la web. Míralo en Atlas (*Browse Collections*) o en Compass conectado a Atlas.
@@ -233,7 +265,8 @@ Un **Deploy Hook** es una URL secreta: quien la llama hace que Render publique l
 | Logs: `bad auth : authentication failed` | Usuario o contraseña de Atlas mal escritos en la cadena | Revisar el paso 1.4 |
 | Logs: `Could not connect to any servers ... IP` | Atlas no permite la conexión | *Network Access* → `0.0.0.0/0` (paso 1.3) |
 | Logs: `nest: not found` al compilar | No se instalaron las dependencias de desarrollo | Build Command con `--include=dev` |
-| Actions: aviso "Falta el secreto RENDER_DEPLOY_HOOK_…" | No se crearon los *Secrets* | Paso 6 |
+| Render no despliega tras un push | Actions falló (en rojo), o Auto-Deploy no está en *After CI Checks Pass* | Revisar Actions; paso 6 |
+| Blueprint: error de validación en `render.yaml` | Algún campo no admitido por la versión actual de Render | Copiar el mensaje a Claude, o usar el camino manual (3-bis y 5) |
 
 ---
 

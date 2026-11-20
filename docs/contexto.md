@@ -90,7 +90,8 @@ Consola para ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/cat
 actividad01/
 ├── .git/                   ← repositorio de Git (oculto; guarda la historia)
 ├── .gitignore              ← ficheros que Git ignora (.DS_Store, node_modules/, dist/, *.tsbuildinfo, .env)
-├── .github/workflows/ci-cd.yml ← GitHub Actions: comprobar + desplegar en Render (D45)
+├── .github/workflows/ci-cd.yml ← GitHub Actions: comprobar frontend y backend (D45, D48)
+├── render.yaml             ← Blueprint de Render: backend + frontend (D48)
 ├── CLAUDE.md               ← instrucciones del profesor (adaptado: D16, D18, D43)
 ├── README.md               ← arranque y estado de las fases
 ├── docs/
@@ -178,6 +179,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D45 | **GitHub Actions** (`.github/workflows/ci-cd.yml`): comprobar frontend (`node --check`), backend (`npm ci`, `build`, arranque con un MongoDB 8.0 temporal y prueba de humo 201/200/400/404) y, solo en push a `main` y si todo pasa, llamar a los **Deploy Hooks** de Render (guardados como *Secrets*). Auto-Deploy de Render en **Off**. | El usuario pidió usar GitHub Actions; solo se publica código probado. | Claude (propuesta) |
 | D46 | Configuración separada para la nube: `main.ts` lee `.env` solo si existe y comprueba `MONGODB_URI`; CORS desde `CORS_ORIGINS`; puerto desde `PORT`. Frontend: `js/config.js` elige backend local o de Render según `location.hostname`. | En Render no hay `.env`; misma base de código para local e Internet. | Claude (propuesta) |
 | D47 | Node **24** fijado en `backend/.node-version` (Render y Actions). Build en Render: `npm ci --include=dev && npm run build`; arranque: `npm run start:prod`. | Versión LTS disponible en ambos; la CLI de Nest es dependencia de desarrollo. | Claude (propuesta) |
+| D48 | **Blueprint `render.yaml`** con los dos servicios y `autoDeployTrigger: checksPass` (Render despliega solo cuando GitHub Actions pasa). Se **quita** del workflow el trabajo de Deploy Hooks (sustituye esa parte de D45): sin Deploy Hooks ni *Secrets*. | El usuario pidió terminar rápido; Claude no puede entrar en Render, así que se reduce el trabajo del usuario a unos clics y una contraseña. | Claude (propuesta) |
 
 ---
 
@@ -310,6 +312,11 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
   CORS desde `CORS_ORIGINS` (origen de Render autorizado, ajeno bloqueado); base de prueba borrada; datos reales intactos (4 productos);
   prueba del navegador con `config.js` OK.
 - Aviso: el token fine-grained necesita el permiso **Workflows: Read and write** para subir `.github/workflows/`.
+  Push rechazado 3 veces (`refusing to allow a Personal Access Token ... without workflow scope`) hasta que el usuario
+  editó el token; después, push OK (`504ade5`). No se pudo seguir el workflow por la API: límite de 60 consultas/hora
+  por IP superado (IP compartida del aula); el script de seguimiento no lo detectó y repitió consultas ~6 min.
+- Claude no puede entrar en Render: se añade el Blueprint `render.yaml` para que el usuario lo cree con unos clics (D48).
+  Error de YAML detectado con Ruby y corregido (un `: ` dentro de un texto sin comillas).
 - Atlas: el usuario ya tenía cuenta. Cluster `cluster0.by4xinj.mongodb.net`; comprobado sin credenciales: DNS (3 réplicas) y conexión
   desde el Mac (saludo `hello` OK). El usuario pegó la contraseña de la BD en la conversación: se le recomendó cambiarla;
   Claude no la usa ni la guarda.
@@ -321,8 +328,8 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [ ] Opcional: evitar que el precio se parta en dos líneas en pantallas estrechas.
 - [x] Instalar Git y hacer el primer commit "fase 1" (D18).
 - [x] Conectar con GitHub y hacer el primer `push` (D20).
-- [ ] Despliegue: commit + push de los ficheros (con permiso **Workflows** en el token).
-- [ ] Despliegue (usuario): Atlas, servicios de Render, Deploy Hooks y *Secrets* (guía, pasos 1, 3, 5 y 6).
+- [x] Despliegue: commit + push (token con permiso Workflows tras varios intentos).
+- [ ] Despliegue (usuario): Render → New → Blueprint → repo → pegar `MONGODB_URI` (guía, paso 3).
 - [ ] Despliegue: poner la URL real del backend en `frontend/js/config.js` (paso 4).
 - [ ] Cambiar la contraseña del usuario de Atlas (se compartió en la conversación).
 - [ ] Atlas: confirmar *Network Access* = `0.0.0.0/0` (necesario para Render).

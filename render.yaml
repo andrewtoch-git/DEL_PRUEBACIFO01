@@ -1,0 +1,37 @@
+# render.yaml — "Blueprint" (plano) de Render: describe los servicios que Render debe crear.
+# En Render: New + → Blueprint → elegir este repositorio → Render lee este fichero y crea todo.
+# Guía: docs/despliegue-render.md
+#
+# autoDeployTrigger: checksPass → Render despliega cada push a "main" SOLO cuando
+# GitHub Actions (.github/workflows/ci-cd.yml) ha terminado en verde. Si una prueba falla, no se publica.
+
+services:
+  # ---------------------------------------------------------------
+  # Backend: NestJS (carpeta backend/)
+  - type: web
+    name: catalogo-backend
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: backend                  # Render trabaja dentro de backend/ (y lee su .node-version)
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run start:prod  # node dist/main
+    healthCheckPath: /productos       # ruta que Render consulta para saber si el servicio está vivo
+    autoDeployTrigger: checksPass
+    envVars:
+      # La cadena de MongoDB Atlas CON contraseña. "sync: false" = Render la PIDE al crear el Blueprint
+      # y la guarda en su panel. Nunca se escribe aquí (el repositorio es público).
+      - key: MONGODB_URI
+        sync: false
+      # Frontend autorizado por CORS. Si Render le pone otro nombre al frontend, cámbialo en el panel.
+      - key: CORS_ORIGINS
+        value: https://catalogo-frontend.onrender.com
+
+  # ---------------------------------------------------------------
+  # Frontend: sitio estático (carpeta frontend/): HTML, CSS y JS tal cual, sin compilar
+  - type: web
+    name: catalogo-frontend
+    runtime: static
+    buildCommand: "echo 'Sin compilacion - HTML, CSS y JS tal cual'"
+    staticPublishPath: ./frontend
+    autoDeployTrigger: checksPass

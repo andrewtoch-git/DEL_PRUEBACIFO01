@@ -7,10 +7,10 @@
 #   1. comprobar-frontend → revisa que el JavaScript no tenga errores de sintaxis.
 #   2. comprobar-backend  → instala, compila y ARRANCA el backend con un MongoDB de prueba
 #                           y le hace peticiones reales (prueba de humo).
-#   3. desplegar          → SOLO si los dos anteriores salen bien y es un push a "main":
-#                           avisa a Render para que publique la nueva versión.
 #
-# Si algo falla, el despliegue no se hace: a Internet solo llega código que funciona.
+# Despliegue: Render (render.yaml, autoDeployTrigger: checksPass) ESPERA a que estos trabajos
+# terminen en verde y solo entonces publica la nueva versión. Si algo falla, no se despliega:
+# a Internet solo llega código que funciona.
 # Guía completa: docs/despliegue-render.md
 # =====================================================================
 
@@ -128,26 +128,3 @@ jobs:
       - name: Mostrar el registro del servidor (si algo ha fallado)
         if: failure()
         run: cat servidor.log || true
-
-  # -------------------------------------------------------------------
-  desplegar:
-    name: Desplegar en Render
-    needs: [comprobar-frontend, comprobar-backend]   # solo si los dos anteriores han ido bien
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      # Un "Deploy Hook" es una URL secreta de Render: al llamarla, Render publica la última versión.
-      # Las URLs se guardan como SECRETOS del repositorio (no en el código, que es público).
-      - name: Avisar a Render (backend)
-        env:
-          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
-        run: |
-          if [ -z "$HOOK" ]; then echo "::warning::Falta el secreto RENDER_DEPLOY_HOOK_BACKEND (ver la guía, paso 6)"; exit 0; fi
-          curl -fsS -X POST "$HOOK" > /dev/null && echo "Despliegue del backend solicitado"
-
-      - name: Avisar a Render (frontend)
-        env:
-          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}
-        run: |
-          if [ -z "$HOOK" ]; then echo "::warning::Falta el secreto RENDER_DEPLOY_HOOK_FRONTEND (ver la guía, paso 6)"; exit 0; fi
-          curl -fsS -X POST "$HOOK" > /dev/null && echo "Despliegue del frontend solicitado"
