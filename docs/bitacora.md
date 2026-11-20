@@ -263,3 +263,41 @@ Navegador (frontend :5500) ──HTTP/JSON──▶ NestJS (:3000, array en memo
 db.prueba_manual.insertOne({ nombre: "Teclado mecánico", marca: "Keychron", ... })
 → _id: ObjectId('6b003637e9f83a052c0d2ae3')
 ```
+
+---
+
+## Fase 9 — Persistencia con Mongoose (20/11/2026)
+
+### Decisiones
+- `@nestjs/mongoose` + `mongoose`. El **esquema** `Producto` describe los documentos; fechas automáticas `creadoEn` y `actualizadoEn`.
+- El `_id` de MongoDB se envía al frontend como `id`, para que el frontend **no tenga que cambiar**.
+- Configuración en `backend/.env` (dirección de MongoDB y puerto), cargada con `process.loadEnvFile()` de Node.
+  En GitHub solo está la plantilla `.env.example`.
+
+### Lo aprendido
+- **Persistencia**: los datos se guardan fuera del programa (en MongoDB) y sobreviven a reinicios.
+- **Mongoose**: traduce entre los objetos de JavaScript y los documentos de MongoDB (esquema → modelo → `find`, `create`...).
+- **Separación de responsabilidades**: solo ha cambiado el **servicio** del backend (array → MongoDB).
+  El controlador apenas cambió (el `id` pasa a ser texto) y el **frontend no cambió nada**.
+- **`.env`**: la configuración cambia según el ordenador (o contiene contraseñas), así que va aparte del código y no se sube.
+- Un error de configuración se ve claro en el registro: `uri ... got "undefined"` = la variable no estaba cargada.
+
+### Verificación
+- `curl`: crear, listar, ver, editar (parcial), validar (400) e id inexistente o imposible (404), todo contra MongoDB.
+- `mongosh`: los documentos están en `catalogo.productos`, con `_id` y fechas.
+- **Backend parado y arrancado de nuevo → los datos siguen ahí.**
+- La prueba automática del navegador, sin tocar el frontend, pasa entera.
+
+---
+
+## Cierre del bloque 3: ¿dónde viven ahora los datos y cuándo se pierden?
+
+```
+Navegador (frontend :5500) ──HTTP/JSON──▶ NestJS (:3000) ──Mongoose──▶ MongoDB (:27017)
+```
+
+| Bloque | Dónde viven los datos | Cuándo se pierden |
+|---|---|---|
+| 1 (fase 3) | `localStorage` del navegador | Al borrar los datos del sitio; otro navegador no los ve |
+| 2 (fases 5–7) | Array en la memoria de NestJS | Al reiniciar el servidor |
+| 3 (fase 9) | MongoDB (`~/mongodb/datos`) | Solo si se borran expresamente |

@@ -27,15 +27,16 @@
 | 2 — Backend | 6. Validación | ✅ Completada |
 | 2 — Backend | 7. Conexión | ✅ Completada (fetch + CORS) |
 | 3 — Base de datos | 8. MongoDB | ✅ Completada (binarios en `~/mongodb`) |
-| 3 — Base de datos | 9. Persistencia | ⏳ Pendiente |
+| 3 — Base de datos | 9. Persistencia | ✅ Completada (Mongoose; frontend sin cambios) |
 | 3 — Base de datos | 10. Repaso | ⏳ Pendiente |
 
-**En curso:** el usuario pidió terminar las fases 4 a 9 (backend, API, validación, conexión, MongoDB y persistencia) y subirlas a GitHub.
-Se avanza fase a fase, con commit y push al cerrar cada una; las decisiones siguen las recomendaciones de Claude (delegadas).
+**Fases 0–9 completadas y subidas a GitHub.** Queda la fase 10 (repaso: recorrido de un dato por todas las piezas), que el usuario no pidió todavía.
+Para usar la aplicación hay que arrancar, en este orden: MongoDB → backend → frontend (ver apartado 2).
 
-**Dónde viven ahora los datos:** en un **array en la memoria del servidor NestJS** (desde la fase 7; antes, `localStorage`).
-- Sobreviven a recargar la página y son los mismos para cualquier navegador que use el backend.
-- **Se pierden al reiniciar el servidor** (vuelven los 3 productos de ejemplo).
+**Dónde viven ahora los datos:** en **MongoDB**, base de datos `catalogo`, colección `productos` (ficheros en `~/mongodb/datos`).
+- Sobreviven a recargar la página, a reiniciar el backend y a apagar el ordenador.
+- Se pierden solo si se borran expresamente (o se borra la carpeta `~/mongodb/datos`).
+- Recorrido: navegador → `fetch` → NestJS (valida con el DTO) → Mongoose → MongoDB, y vuelta.
 
 ---
 
@@ -83,7 +84,7 @@ Consola para ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/cat
 ```
 actividad01/
 ├── .git/                   ← repositorio de Git (oculto; guarda la historia)
-├── .gitignore              ← ficheros que Git ignora (.DS_Store, node_modules/, dist/)
+├── .gitignore              ← ficheros que Git ignora (.DS_Store, node_modules/, dist/, *.tsbuildinfo, .env)
 ├── CLAUDE.md               ← instrucciones del profesor (adaptado: D16, D18)
 ├── README.md               ← arranque y estado de las fases
 ├── docs/
@@ -91,14 +92,16 @@ actividad01/
 │   ├── bitacora.md
 │   └── glosario.md
 ├── backend/                ← NestJS (bloque 2), generado con la CLI
+│   ├── .env                ← configuración local (MONGODB_URI, PORT). NO se sube a GitHub
+│   ├── .env.example        ← plantilla del .env (sí se sube)
 │   ├── package.json        ← dependencias y scripts (start:dev...)
 │   └── src/
-│       ├── main.ts         ← arranque: crea la app y escucha en el puerto 3000
+│       ├── main.ts         ← arranque: carga .env, CORS, validación y escucha en el puerto
 │       ├── app.module.ts   ← módulo raíz
 │       ├── app.controller.ts ← GET / → "¡Hola desde el backend!"
 │       ├── app.service.ts
 │       └── productos/      ← recurso productos (fase 5)
-│           ├── producto.ts               ← interfaz: forma de un producto
+│           ├── producto.schema.ts        ← esquema de MongoDB (fase 9; sustituye a producto.ts)
 │           ├── dto/                      ← reglas de entrada (fase 6)
 │           │   ├── crear-producto.dto.ts
 │           │   └── actualizar-producto.dto.ts
@@ -126,7 +129,7 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D5 | VS Code instalado en `~/Applications` descargándolo de la web oficial, sin Homebrew ni `sudo`. | El usuario no es administrador y no hay Homebrew. | Claude (delegado) |
 | D6 | **Servidor local: `live-server` con `npx`, puerto 5500, sirviendo `frontend/`.** | La extensión de VS Code no llegó a activarse (probable *modo restringido*) y el usuario prefirió no depender de VS Code. | Usuario |
 | D7 | VS Code se conserva, solo como editor. | Hace falta un editor; TextEdit es incómodo para programar. | Usuario |
-| D8 | Identificador de producto en bloques 1 y 2: número que va subiendo (1, 2, 3…). | Lo más sencillo. | Claude (delegado) |
+| D8 | Identificador de producto en bloques 1 y 2: número que va subiendo (1, 2, 3…). En el bloque 3, el `_id` de MongoDB (D39). | Lo más sencillo. | Claude (delegado) |
 | D9 | Precio con hasta 2 decimales. | Son euros (céntimos). | Claude (delegado) |
 | D10 | Los productos escritos a mano en la fase 1 se sustituirán en la fase 3 por los generados desde un array. | Así lo plantea `CLAUDE.md`. | Claude (delegado) |
 | D11 | El listado se muestra en una **tabla** (`<table>`). | Datos con las mismas columnas: caso típico de tabla. | Usuario (aceptó la recomendación) |
@@ -156,6 +159,10 @@ Numeradas para poder citarlas ("según la D7…"). Si una decisión cambia, no s
 | D35 | MongoDB instalado con los **binarios oficiales** (`.tgz` de fastdl.mongodb.org y `.zip` de mongosh en GitHub), verificados con SHA-256 y copiados a `~/mongodb/bin`. Sustituye a la instalación con Homebrew prevista en `CLAUDE.md`. | El equipo no tiene Homebrew ni permisos de administrador. | Claude (delegado) |
 | D36 | Versiones: MongoDB **8.0.38** (rama madura, compatible con Mongoose) y mongosh **2.14.1** (no la publicada el día anterior). | Estabilidad y prudencia con versiones recién publicadas. | Claude (delegado) |
 | D37 | `mongod` escucha solo en `127.0.0.1` (no en la red del aula). No se añade `~/mongodb/bin` al PATH (no se toca `~/.zshrc`). | Seguridad y no modificar la configuración del sistema sin necesidad. | Claude (delegado) |
+| D38 | Persistencia con `@nestjs/mongoose` 12 + `mongoose` 9. Esquema `Producto` en `producto.schema.ts` (sustituye a la interfaz `producto.ts`, borrada). Fechas automáticas `creadoEn` / `actualizadoEn`. Sin campo `__v`. | `CLAUDE.md` fase 9; fechas sugeridas en 5.1. | Claude (delegado) |
+| D39 | Al enviar JSON, el `_id` se convierte en `id` (texto) y se quita `_id`. Un id con formato imposible responde 404 (igual que uno inexistente). | Que el **frontend no cambie**: sigue usando `producto.id`. | Claude (delegado) |
+| D40 | Configuración en `backend/.env` (`MONGODB_URI`, `PORT`), leído con `process.loadEnvFile()` de Node (sin librería extra) y `MongooseModule.forRootAsync`. Se sube `.env.example`; `.env` va al `.gitignore`. | `CLAUDE.md` 6: configuración separada del código; menos dependencias. | Claude (delegado) |
+| D41 | La colección empieza vacía; los 3 productos de ejemplo se crearon **a través de la API** con `curl`. | Ejercitar el `POST` real contra la base de datos. | Claude (delegado) |
 
 ---
 
@@ -260,6 +267,17 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - Con `mongosh`: `insertOne` en la colección `prueba_manual` de la base `catalogo` → MongoDB generó el `_id` (`ObjectId`).
   La base `catalogo` no existía antes: se crea al guardar el primer documento.
 
+**Fase 9 — Persistencia (Mongoose)**
+- `npm install @nestjs/mongoose mongoose` (compatibles con NestJS 12). Esquema, servicio `async` con el modelo, controlador con `id` de texto (D38, D39).
+- `.env` + `.env.example` + `.gitignore` (D40). Error momentáneo al guardar `app.module.ts` antes que `main.ts`:
+  `The uri parameter ... got "undefined"` (aún no se cargaba el `.env`); se resolvió al guardar `main.ts`.
+- Pruebas con `curl`: lista vacía → 3 `POST` (201) → GET, PATCH parcial (cambia `actualizadoEn`), POST inválido 400, id `abc` 404, id inexistente 404.
+- `mongosh` muestra los documentos con `_id` y fechas.
+- **Persistencia comprobada:** backend parado (000) y arrancado de nuevo → los 3 productos siguen, con el stock editado.
+- **Frontend sin cambios** (`git diff` vacío desde la fase 7) y la prueba automática del navegador pasa entera.
+- `CLAUDE.md` actualizado: MongoDB con binarios en `~/mongodb` en vez de Homebrew.
+- **Bloque 3 (salvo la fase 10 de repaso) cerrado.**
+
 ## 6. Pendientes y preguntas abiertas
 
 - [x] Revisar el estilo de la fase 2 (capturas de Chrome headless a 1280 y 600 px).
@@ -269,7 +287,9 @@ que lo guardó en el llavero de macOS con `git credential approve` (no está en 
 - [x] Conectar con GitHub y hacer el primer `push` (D20).
 - [ ] Revocar el token de GitHub cuando deje de usarse (se compartió en la conversación con Claude).
 - [x] Fase 3 (con `localStorage`, D17).
-- [ ] Que el usuario pruebe la aplicación en su navegador (frontend + backend arrancados).
+- [ ] Que el usuario pruebe la aplicación en su navegador (MongoDB + backend + frontend arrancados).
+- [ ] Fase 10: repaso (recorrido de un dato por todas las piezas).
+- [ ] Opcional: los tests generados por Nest no se han adaptado (el e2e necesitaría MongoDB).
 - [x] Commit y push de la fase 3.
 - [x] Decidir el orden: se sigue el de `CLAUDE.md` (D25).
 - [x] Fase 4 (NestJS mínimo).

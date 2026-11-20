@@ -21,7 +21,9 @@ Proyecto de aprendizaje: aplicación fullstack mínima en local, construida por 
 
 ### Backend (bloque 2)
 1. Abrir **otra** terminal en `actividad01/backend`.
-2. La primera vez (o tras descargar el proyecto): `npm install` (descarga las librerías en `node_modules/`).
+2. La primera vez (o tras descargar el proyecto):
+   - `npm install` (descarga las librerías en `node_modules/`).
+   - Copiar la configuración: `cp .env.example .env` (el `.env` no está en GitHub).
 3. Arrancar: `npm run start:dev` → escucha en `http://localhost:3000` y se reinicia al guardar cambios.
 4. Probar: `curl http://localhost:3000/`.
 
@@ -47,5 +49,5 @@ Ver los datos: `~/mongodb/bin/mongosh mongodb://127.0.0.1:27017/catalogo`.
 | 2 — Backend | 6. Validación | ✅ Completada |
 | 2 — Backend | 7. Conexión | ✅ Completada |
 | 3 — Base de datos | 8. MongoDB | ✅ Completada |
-| 3 — Base de datos | 9. Persistencia | ⏳ Pendiente |
+| 3 — Base de datos | 9. Persistencia | ✅ Completada |
 | 3 — Base de datos | 10. Repaso | ⏳ Pendiente |

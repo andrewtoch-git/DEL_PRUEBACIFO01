@@ -5,7 +5,7 @@
 //   GET    /productos/:id  → obtenerUno
 //   PATCH  /productos/:id  → actualizar
 //   DELETE /productos/:id  → eliminar
-import { Body, Controller, Delete, Get, HttpCode, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
 import { ProductosService } from './productos.service.js';
 // Importación normal (no "import type"): ValidationPipe necesita las CLASES de los DTO para leer sus reglas
 import { CrearProductoDto } from './dto/crear-producto.dto.js';
@@ -27,21 +27,21 @@ export class ProductosController {
     return this.productosService.listar();   // NestJS convierte la lista en JSON automáticamente
   }
 
-  // :id es un trozo variable de la ruta. ParseIntPipe lo convierte de texto a número
-  // (y responde 400 si no es un número, por ejemplo /productos/abc).
+  // :id es un trozo variable de la ruta. Desde la fase 9 es el _id de MongoDB (un texto),
+  // así que ya no se convierte a número (antes: ParseIntPipe).
   @Get(':id')
-  obtenerUno(@Param('id', ParseIntPipe) id: number) {
+  obtenerUno(@Param('id') id: string) {
     return this.productosService.obtenerUno(id);
   }
 
   @Patch(':id')
-  actualizar(@Param('id', ParseIntPipe) id: number, @Body() datos: ActualizarProductoDto) {
+  actualizar(@Param('id') id: string, @Body() datos: ActualizarProductoDto) {
     return this.productosService.actualizar(id, datos);
   }
 
   @Delete(':id')
   @HttpCode(204)   // 204 = "hecho, y no hay nada que devolver"
-  eliminar(@Param('id', ParseIntPipe) id: number) {
-    this.productosService.eliminar(id);
+  async eliminar(@Param('id') id: string) {
+    await this.productosService.eliminar(id);   // esperar a que MongoDB termine (y propagar el 404)
   }
 }

@@ -75,7 +75,7 @@ No corrijas errores en silencio: los errores son parte del aprendizaje.
 | Servidor local del frontend | `live-server` (npm), con `npx` | 1 | Confirmado en la fase 0 (ver D6 en `docs/contexto.md`): `npx live-server --host=127.0.0.1 --port=5500 frontend`. |
 | Backend | NestJS (TypeScript) | 2 | API REST. |
 | Pruebas de la API | `curl` | 2 | Desde la terminal. |
-| Base de datos | MongoDB Community instalado en local | 3 | Instalación mediante Homebrew. **Revisar al llegar al bloque 3:** el equipo no tiene Homebrew y el usuario no es administrador. |
+| Base de datos | MongoDB Community instalado en local | 3 | Binarios oficiales en `~/mongodb` (el equipo no tiene Homebrew ni permisos de administrador; ver D35 en `docs/contexto.md`). |
 | Conexión a BD | Mongoose (`@nestjs/mongoose`) | 3 | Librería que conecta NestJS con MongoDB. |
 | Ver los datos | `mongosh` y/o MongoDB Compass | 3 | |
 

@@ -1,61 +1,61 @@
 // productos.service.ts — SERVICIO: la lógica de los productos.
-// Fase 5: los datos viven en un ARRAY EN MEMORIA dentro del servidor.
-// → Sobreviven a recargar la página, pero se pierden al reiniciar el servidor.
+// Fase 9: los datos se guardan en MONGODB a través de Mongoose.
+// → Sobreviven a recargar la página, a reiniciar el servidor y a apagar el ordenador.
+//
+// Comparado con la fase 5 (array en memoria), los métodos hacen lo mismo, pero:
+// - son "async": hablar con la base de datos lleva tiempo (va por la red, aunque sea local);
+// - el id es el _id de MongoDB (un texto como "6b0036..."), no un número.
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Producto } from './producto.js';
+import { InjectModel } from '@nestjs/mongoose';
+import { isValidObjectId, Model } from 'mongoose';
+import { Producto } from './producto.schema.js';
 import type { CrearProductoDto } from './dto/crear-producto.dto.js';
 import type { ActualizarProductoDto } from './dto/actualizar-producto.dto.js';
 
 @Injectable()
 export class ProductosService {
-  // Productos de ejemplo con los que arranca el servidor
-  private productos: Producto[] = [
-    { id: 1, nombre: 'MacBook Air 13"', marca: 'Apple', categoria: 'portatil', precio: 1199, stock: 5, descripcion: 'Portátil ligero con chip M3.' },
-    { id: 2, nombre: 'Galaxy S24', marca: 'Samsung', categoria: 'smartphone', precio: 899.99, stock: 12, descripcion: 'Pantalla de 6,2 pulgadas.' },
-    { id: 3, nombre: 'WH-1000XM5', marca: 'Sony', categoria: 'audio', precio: 349, stock: 0, descripcion: '' },
-  ];
+  // El "modelo" es el objeto de Mongoose para leer y escribir en la colección "productos".
+  // NestJS lo inyecta gracias a @InjectModel.
+  constructor(@InjectModel(Producto.name) private readonly modelo: Model<Producto>) {}
 
-  // id que tendrá el próximo producto creado
-  private siguienteId = 4;
-
-  listar(): Producto[] {
-    return this.productos;
+  async listar() {
+    return this.modelo.find();   // todos los documentos de la colección
   }
 
-  obtenerUno(id: number): Producto {
-    const producto = this.productos.find((p) => p.id === id);
+  async obtenerUno(id: string) {
+    // Un id con formato imposible no puede existir: respondemos 404 igual que si no estuviera
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(`No existe ningún producto con id ${id}`);
+    }
+    const producto = await this.modelo.findById(id);
     if (!producto) {
-      // NestJS convierte esta excepción en una respuesta HTTP 404 (no encontrado)
       throw new NotFoundException(`No existe ningún producto con id ${id}`);
     }
     return producto;
   }
 
-  // Los datos ya llegan VALIDADOS (fase 6). El id lo pone el servidor, nunca el cliente.
-  crear(datos: CrearProductoDto): Producto {
-    // Si no viene descripción, se guarda como texto vacío
-    const nuevo: Producto = { id: this.siguienteId, ...datos, descripcion: datos.descripcion ?? '' };
-    this.siguienteId++;
-    this.productos.push(nuevo);
-    return nuevo;
+  // Los datos ya llegan VALIDADOS por el DTO. El _id lo pone MongoDB.
+  async crear(datos: CrearProductoDto) {
+    return this.modelo.create(datos);
   }
 
-  // PATCH: solo llegan los campos que cambian (todos opcionales en ActualizarProductoDto)
-  actualizar(id: number, datos: ActualizarProductoDto): Producto {
-    const producto = this.obtenerUno(id);   // si no existe, lanza el 404
+  async actualizar(id: string, datos: ActualizarProductoDto) {
+    await this.obtenerUno(id);   // si no existe, lanza el 404
 
-    // Copiamos SOLO los campos que traen valor. Los que no se enviaron existen en el DTO
-    // con valor undefined, y si los copiáramos borrarían los datos buenos (error visto en la fase 6).
+    // Solo los campos que traen valor (los no enviados existen como undefined: ver D32, fase 6)
+    const cambios: Record<string, unknown> = {};
     for (const [campo, valor] of Object.entries(datos)) {
       if (valor !== undefined) {
-        (producto as unknown as Record<string, unknown>)[campo] = valor;
+        cambios[campo] = valor;
       }
     }
-    return producto;
+
+    // returnDocument: 'after' → devuelve el documento YA modificado
+    return this.modelo.findByIdAndUpdate(id, cambios, { returnDocument: 'after' });
   }
 
-  eliminar(id: number): void {
-    this.obtenerUno(id);   // comprueba que existe (si no, 404)
-    this.productos = this.productos.filter((p) => p.id !== id);
+  async eliminar(id: string) {
+    await this.obtenerUno(id);   // si no existe, lanza el 404
+    await this.modelo.findByIdAndDelete(id);
   }
 }

@@ -126,3 +126,14 @@ Términos técnicos explicados con palabras sencillas, en el orden en que aparec
 - **`mongosh`**: la consola (shell) para hablar con MongoDB escribiendo comandos.
 - **Binario**: programa ya compilado, listo para ejecutar.
 - **SHA-256 (huella)**: "huella dactilar" de un fichero; si cambia un solo byte, la huella cambia.
+
+## Fase 9
+
+- **Persistencia**: que los datos sobrevivan aunque se cierre o reinicie el programa.
+- **Mongoose**: librería que conecta Node.js con MongoDB usando esquemas y modelos.
+- **Esquema**: descripción de la forma de los documentos de una colección (campos, tipos, obligatorios).
+- **Modelo**: objeto creado a partir del esquema para leer y escribir documentos (`find`, `create`, `findByIdAndUpdate`...).
+- **Cadena de conexión (URI)**: dirección de la base de datos, como `mongodb://127.0.0.1:27017/catalogo`.
+- **Variable de entorno**: valor de configuración que el programa lee al arrancar (`process.env.MONGODB_URI`).
+- **`.env`**: fichero con variables de entorno; se mantiene fuera de Git porque depende del equipo o contiene secretos.
+- **Separación de responsabilidades**: cada pieza hace una sola cosa; por eso cambiar dónde se guardan los datos no obliga a tocar el frontend.

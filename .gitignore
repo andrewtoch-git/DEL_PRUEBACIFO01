@@ -10,3 +10,6 @@ node_modules/
 dist/
 # Caché de compilación de TypeScript (se regenera sola)
 *.tsbuildinfo
+
+# Configuración local con posibles datos privados (fase 9). Se sube solo la plantilla .env.example
+.env

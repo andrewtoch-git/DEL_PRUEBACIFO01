@@ -7,6 +7,17 @@ import { AppModule } from './app.module.js';
 // "async" porque crear la aplicación y ponerla a escuchar lleva un tiempo:
 // "await" espera a que cada paso termine antes de seguir.
 async function bootstrap() {
+  // Configuración (fase 9): carga las variables del fichero .env en process.env.
+  // process.loadEnvFile() viene incluido en Node.js, así que no hace falta ninguna librería extra.
+  // La configuración va en .env, separada del código, porque cambia según el ordenador
+  // (y en proyectos reales puede contener contraseñas que no deben subirse a GitHub).
+  try {
+    process.loadEnvFile();   // lee ".env" de la carpeta desde la que se arranca (backend/)
+  } catch {
+    console.error('No se encuentra backend/.env. Cópialo desde backend/.env.example y vuelve a arrancar.');
+    process.exit(1);
+  }
+
   // Crea la aplicación a partir del módulo raíz (AppModule)
   const app = await NestFactory.create(AppModule);
 
@@ -26,8 +37,8 @@ async function bootstrap() {
     }),
   );
 
-  // Pone el servidor a escuchar peticiones HTTP en el puerto 3000
-  await app.listen(3000);
+  // Pone el servidor a escuchar peticiones HTTP en el puerto del .env (3000 si no se indica)
+  await app.listen(process.env.PORT ?? 3000);
 }
 
 await bootstrap();
