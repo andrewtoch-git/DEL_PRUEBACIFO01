@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!-- Fase 1: solo ESTRUCTURA. Los botones aún no hacen nada (eso llega en la fase 3 con JavaScript). -->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- Hace que la página se adapte al ancho de la pantalla (móvil, portátil...) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo tecnológico</title>
+  <!-- Enlace a la hoja de estilos (fase 2): el HTML dice QUÉ hay; el CSS, CÓMO se ve -->
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+  <!-- Cabecera de la página -->
+  <header>
+    <h1>Catálogo tecnológico</h1>
+    <p>Gestión de productos: crear, ver, editar y eliminar.</p>
+  </header>
+
+  <main>
+
+    <!-- Zona de mensajes: vacía por ahora. En la fase 3, JavaScript escribirá aquí los avisos de éxito o error.
+         role="status" indica a los lectores de pantalla que aquí aparecen avisos. -->
+    <div id="mensajes" role="status"></div>
+
+    <!-- Sección del formulario: sirve para crear y (en la fase 3) también para editar -->
+    <section>
+      <h2>Nuevo producto</h2>
+
+      <!-- Los atributos required, minlength, maxlength y min son validación del propio HTML:
+           el navegador impide enviar el formulario si no se cumplen. -->
+      <form id="formulario-producto">
+
+        <!-- El "for" de cada <label> coincide con el "id" de su campo: así quedan enlazados -->
+        <p>
+          <label for="nombre">Nombre *</label><br>
+          <input type="text" id="nombre" name="nombre" required minlength="2" maxlength="100">
+        </p>
+
+        <p>
+          <label for="marca">Marca *</label><br>
+          <input type="text" id="marca" name="marca" required minlength="2" maxlength="50">
+        </p>
+
+        <p>
+          <label for="categoria">Categoría *</label><br>
+          <!-- Lista cerrada: solo se puede elegir una de estas opciones.
+               "value" es lo que se guarda (sin tildes); el texto es lo que se ve. -->
+          <select id="categoria" name="categoria" required>
+            <option value="">-- Elige una categoría --</option>
+            <option value="portatil">Portátil</option>
+            <option value="smartphone">Smartphone</option>
+            <option value="tablet">Tablet</option>
+            <option value="periferico">Periférico</option>
+            <option value="audio">Audio</option>
+            <option value="accesorio">Accesorio</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="precio">Precio (€) *</label><br>
+          <!-- step="0.01" permite hasta 2 decimales (céntimos) -->
+          <input type="number" id="precio" name="precio" required min="0" step="0.01">
+        </p>
+
+        <p>
+          <label for="stock">Stock (unidades) *</label><br>
+          <!-- step="1" obliga a que sea un número entero -->
+          <input type="number" id="stock" name="stock" required min="0" step="1">
+        </p>
+
+        <p>
+          <label for="descripcion">Descripción (opcional)</label><br>
+          <textarea id="descripcion" name="descripcion" maxlength="300" rows="3"></textarea>
+        </p>
+
+        <p>
+          <!-- type="submit" envía el formulario; type="reset" vacía los campos -->
+          <button type="submit">Guardar</button>
+          <button type="reset">Cancelar</button>
+        </p>
+
+        <p><small>* Campo obligatorio</small></p>
+      </form>
+    </section>
+
+    <!-- Sección del listado -->
+    <section>
+      <h2>Productos</h2>
+
+      <!-- Tabla: cada fila (<tr>) es un producto; cada celda (<td>) un dato -->
+      <table>
+        <!-- <thead>: fila de títulos de las columnas -->
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Marca</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <!-- <tbody>: los datos. Ahora están escritos a mano; en la fase 3 los generará JavaScript desde un array. -->
+        <tbody id="lista-productos">
+          <tr>
+            <td>MacBook Air 13"</td>
+            <td>Apple</td>
+            <td>Portátil</td>
+            <td>1199,00 €</td>
+            <td>5</td>
+            <td>Portátil ligero con chip M3.</td>
+            <td>
+              <button type="button">Editar</button>
+              <button type="button">Eliminar</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Galaxy S24</td>
+            <td>Samsung</td>
+            <td>Smartphone</td>
+            <td>899,99 €</td>
+            <td>12</td>
+            <td>Pantalla de 6,2 pulgadas.</td>
+            <td>
+              <button type="button">Editar</button>
+              <button type="button">Eliminar</button>
+            </td>
+          </tr>
+          <tr>
+            <td>WH-1000XM5</td>
+            <td>Sony</td>
+            <td>Audio</td>
+            <td>349,00 €</td>
+            <td>0</td>
+            <td></td>
+            <td>
+              <button type="button">Editar</button>
+              <button type="button">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+</body>
+</html>

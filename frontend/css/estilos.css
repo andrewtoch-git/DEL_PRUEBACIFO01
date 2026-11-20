@@ -1,0 +1,172 @@
+/* =========================================================
+   Fase 2: PRESENTACIÓN
+   Este fichero solo decide cómo se VE la página.
+   La estructura sigue en index.html; aquí no hay contenido.
+   ========================================================= */
+
+/* --- Variables: colores en un solo sitio para cambiarlos fácilmente --- */
+:root {
+  --color-fondo: #f4f6f8;
+  --color-tarjeta: #ffffff;
+  --color-texto: #222831;
+  --color-suave: #6b7280;
+  --color-borde: #d9dde3;
+  --color-principal: #2563eb;      /* azul: acción principal (Guardar, Editar) */
+  --color-principal-oscuro: #1d4ed8;
+  --color-peligro: #dc2626;        /* rojo: acción destructiva (Eliminar) */
+}
+
+/* --- Base --- */
+/* box-sizing: border-box hace que el ancho incluya el relleno y el borde (más fácil de calcular) */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  line-height: 1.5;
+}
+
+/* --- Cabecera --- */
+header {
+  background: var(--color-principal);
+  color: white;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  margin: 0.25rem 0 0;
+  opacity: 0.9;
+}
+
+/* --- Contenido principal: centrado y con ancho máximo para que se lea bien --- */
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* Cada sección se ve como una "tarjeta" blanca */
+section {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+/* --- Formulario --- */
+label {
+  font-weight: 600;
+}
+
+/* Todos los campos con el mismo aspecto y ancho completo */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  font: inherit;               /* usan la misma letra que el resto de la página */
+  border: 1px solid var(--color-borde);
+  border-radius: 4px;
+}
+
+/* :focus = el campo en el que estás escribiendo */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--color-principal);
+  border-color: var(--color-principal);
+}
+
+textarea {
+  resize: vertical;            /* solo se puede agrandar hacia abajo */
+}
+
+small {
+  color: var(--color-suave);
+}
+
+/* --- Botones --- */
+button {
+  font: inherit;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--color-principal);
+  border-radius: 4px;
+  background: var(--color-principal);
+  color: white;
+  cursor: pointer;             /* el ratón se convierte en "manita" */
+}
+
+button:hover {
+  background: var(--color-principal-oscuro);
+}
+
+/* Cancelar: botón secundario, menos llamativo */
+button[type="reset"] {
+  background: white;
+  color: var(--color-principal);
+}
+
+button[type="reset"]:hover {
+  background: var(--color-fondo);
+}
+
+/* --- Tabla del listado --- */
+table {
+  width: 100%;
+  border-collapse: collapse;   /* une los bordes de las celdas en una sola línea */
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--color-borde);
+  vertical-align: top;
+}
+
+th {
+  background: var(--color-fondo);
+  font-size: 0.9rem;
+}
+
+/* Filas alternas con un fondo suave para seguir mejor cada línea */
+tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+/* Los botones de cada fila, un poco más pequeños y separados */
+td button {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+  margin: 0 0.25rem 0.25rem 0;
+}
+
+/* El botón "Eliminar" es el último de la fila: lo pintamos de rojo */
+td button:last-child {
+  background: var(--color-peligro);
+  border-color: var(--color-peligro);
+}
+
+/* --- Pantallas estrechas (móvil): la tabla se desplaza en horizontal --- */
+@media (max-width: 700px) {
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
